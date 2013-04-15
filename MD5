@@ -1,0 +1,12 @@
+192df820751982e2b239d4d8cfbd8fb8 *DESCRIPTION
+df390c53434517b304ac5db487184641 *NAMESPACE
+49e133c91037a4e6b1cf085a1629559e *NEWS
+a0dee6f348f707e8ed5199ead0eaa888 *R/TestScorer.R
+7ff1d9372d51822d980c825e01c1dcbb *inst/doc/TestScorerHelp.pdf
+853a55349011d9b059b4bc879824f4e3 *inst/some.stuff/Help.txt
+04f937269e11dff4a8e3494ffd6356a5 *inst/some.stuff/TST_DASS.r
+7e23ed3e0f50e34c771dd39dd262502e *inst/some.stuff/TST_MHLC.r
+fc22a287d3f4844dcacda02dd070df73 *inst/some.stuff/TST_RAAS.r
+e4d2685cffe508f0dd7517421bac78fb *man/TestScorer-internal.Rd
+af379d1ac81976021b92ffaf2385d73d *man/TestScorer-package.Rd
+9036d9de8ebbdcb7228a797b60d32856 *man/TestScorerGUI.Rd
