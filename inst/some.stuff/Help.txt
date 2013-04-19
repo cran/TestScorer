@@ -1,0 +1,124 @@
+ENTERING ITEMS AND SCORING A TEST
+=================================
+
+1. Choosing a test
+------------------
+
+Note that all gray windows are non editable, they show useful 
+information. The first step is choosing the test whose items 
+you want to introduce and score. In the upper left corner you
+will find a window labeled "Which test would you like to 
+score?". Find the test name using the scrolling bar if 
+necessary, and click on it. The test's name will be 
+highlighted. Now you can see the characteristics of this test 
+on the window labeled "Test details". Beyond the name of the
+test, its authors , and some comment, you will find the number
+of items, the valid answers and the codes for missing 
+answers.
+
+2. Entering the identification data of the subject
+--------------------------------------------------
+
+In the middle part of the window you can enter some data on 
+the subject. These are optional fields which admit any 
+characters, except for sex which is recorded through radio 
+buttons.
+
+3. Entering the items
+---------------------
+
+On the upper right corner of the main window you will find 
+the area for entering the items which is labeled "Entry items 
+window". The first line shows the number of the item to be 
+entered. You have to put the cursor in the white rectangle 
+located on the left. DO NOT MOVE THE CURSOR FROM THIS 
+POSITION WHILE ENTERING ITEMS, all the necessary actions are 
+done through the keyboard. The numerical keypad is the most 
+convenient way to introduce the answers, but the numerical 
+keys and the spacebar of the main keyboard can also be used.
+
+Enter the answer of the items using the keyboard. Only the 
+valid and missing characters shown in the "Test details" 
+window are allowed. If you enter an invalid character a pop-
+up window appears highlighting the error and the program is 
+blocked until the error window is closed.
+
+Every time you enter a valid answer the counter of items will 
+increase in one unit until all the items are entered. The 
+progression is reflected in two ways. First, the "Item to 
+enter" is updated. Second, in the lower part of the window 
+will appear the answers just introduced and an asterisk (*) 
+showing the position of the next answer to be entered (see 
+figure 1). As any gray window of the GUI, this one is non 
+editable. Every line shows ten items, corresponding to the 
+numbers shown in the right margin, and the upper margin 
+indicates the position in the group of ten.
+
+The window allows the representation of 100 items, but the 
+ones which exceed the length of the test are crossed out with 
+an equal symbol (=). Had the test more than one hundred 
+items, the window would be refreshed showing the next hundred 
+automatically.
+
+In case of error, you can move through the answers using the 
+arrow keys and introduce the correction for the appropriate 
+items. Right and left arrow move to the previous or posterior 
+answer respectively. The up and down arrows jump to the tenth 
+previous or following answer. The use of the arrows updates 
+the number of the new answer to be introduced and the 
+position of the asterisk indicator automatically. If you try 
+to go to an answer beyond the limits of the test a pop-up 
+window will alert you of the invalid choice.
+
+4. Scoring the test
+-------------------
+
+When you have entered all the answers press the "Score" 
+button to get the results which appear on the R's main 
+window. From the R's menu bar you can print or save the 
+results.
+
+5. Recording scores and answers to a file
+-----------------------------------------
+
+It is possible to record the items and scores of the tests in 
+a file for further statistical analysis. To do so, click on 
+the button labeled "Click here to choose a file for saving 
+the results". This opens a system window for choosing or 
+creating a file for recording. If the file already exists the 
+new information will be appended. The chosen file will be 
+showed in the window labeled "Where would you like to save 
+the scores?". Some tests are carried out to enssure that the 
+old file structure is compatible with the new data, but the 
+user must be careful and take the necessary precautions 
+themselves. The radio buttons beneath the "Would you like to 
+save the items" label allow recording the answers (as 
+introduced through the keyboard without further processing) 
+in addition to the scores.
+
+The data are written to an ascii text file with semicolons
+between fields as delimiters. These kinds of file are easily
+imported by almost any program and also by R.
+
+
+OTHER BUTTONS
+=============
+
+At the bottom of the screen you will find different buttons:
+ 
+"Score" is for scoring as explained previously.
+
+"Clean Items", cleans the items but maintains the 
+    identification information of the subject. So you can 
+    introduce and score another test of the same subject
+    without reintroducing his or her data.
+    
+"Clean all", cleans both the items and the identification data.
+
+"Test manager" creates instructions for scoring a new test or
+    deletes ones already existent. See the document
+    "TestScorerHelp.pdf" which you can find in this directory.
+    
+"Help" shows this document.
+
+"Exit TestScorer" exits and closes the TestScorer window.
