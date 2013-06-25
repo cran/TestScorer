@@ -3,7 +3,7 @@
 \alias{delete.test}
 \alias{make.scale.window}
 \alias{make.test.window}
-\alias{setTestsDirectory}
+\alias{set.tests.directory}
 \alias{write.scale}
 \alias{write.test.begining}
 \alias{write.test.end}
