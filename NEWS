@@ -1,3 +1,9 @@
-1.0-1 (2013-04-16)
+1.2 (2013-6-25)
+  * Tktable used for transforming raw scores
+  * Now package works even if not installed under R home directory, code suggested by K. Antal
+  * A few more warning and error messages were added
+
+1.1 (2013-04-20)
+  * Minor bugs fixed
   * Code improvements for compatibility
   * Fixed some typographical errors
