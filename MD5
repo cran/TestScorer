@@ -1,9 +1,10 @@
-ce17bb7b5a55f096585b7add5b81c314 *DESCRIPTION
+a2ff4d4658f9f1c7c94b7ec22029d439 *DESCRIPTION
 df390c53434517b304ac5db487184641 *NAMESPACE
-05d1206d7a7dd452787a3b52a59dfbae *NEWS
-de1ef5c55a044809a2641ac3ddf24765 *R/TestScorer.R
-a5f0e69fd4d100e3cd41897ee194d23f *inst/doc/TestScorerHelp.pdf
-853a55349011d9b059b4bc879824f4e3 *inst/some.stuff/Help.txt
+98d485ad5f89c17622b988b08491099c *NEWS
+2254e54bce8991716f533e2646c2d208 *R/TestScorer.R
+d43fb11783333791e0305bf7eb8fe2fd *TestScorerHelp.pdf
+d43fb11783333791e0305bf7eb8fe2fd *inst/doc/TestScorerHelp.pdf
+ecce39808a79c96f3ea19538aeb8b842 *inst/some.stuff/Help.txt
 57ad26a80b18f18025738fb0e3e128a5 *inst/some.stuff/TST_DASS.r
 0d26d6efe4950039d4e780794317be9a *inst/some.stuff/TST_MHLC.r
 02f1efcf9c9bd079b174f83b330778f0 *inst/some.stuff/TST_RAAS.r

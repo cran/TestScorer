@@ -3,7 +3,6 @@ ENTERING ITEMS AND SCORING A TEST
 
 1. Choosing a test
 ------------------
-
 Note that all gray windows are non editable, they show useful 
 information. The first step is choosing the test whose items 
 you want to introduce and score. In the upper left corner you
@@ -18,7 +17,6 @@ answers.
 
 2. Entering the identification data of the subject
 --------------------------------------------------
-
 In the middle part of the window you can enter some data on 
 the subject. These are optional fields which admit any 
 characters, except for sex which is recorded through radio 
@@ -26,7 +24,6 @@ buttons.
 
 3. Entering the items
 ---------------------
-
 On the upper right corner of the main window you will find 
 the area for entering the items which is labeled "Entry items 
 window". The first line shows the number of the item to be 
@@ -72,7 +69,6 @@ window will alert you of the invalid choice.
 
 4. Scoring the test
 -------------------
-
 When you have entered all the answers press the "Score" 
 button to get the results which appear on the R's main 
 window. From the R's menu bar you can print or save the 
@@ -80,7 +76,6 @@ results.
 
 5. Recording scores and answers to a file
 -----------------------------------------
-
 It is possible to record the items and scores of the tests in 
 a file for further statistical analysis. To do so, click on 
 the button labeled "Click here to choose a file for saving 
@@ -100,10 +95,8 @@ The data are written to an ascii text file with semicolons
 between fields as delimiters. These kinds of file are easily
 imported by almost any program and also by R.
 
-
 OTHER BUTTONS
 =============
-
 At the bottom of the screen you will find different buttons:
  
 "Score" is for scoring as explained previously.
@@ -121,4 +114,9 @@ At the bottom of the screen you will find different buttons:
     
 "Help" shows this document.
 
-"Exit TestScorer" exits and closes the TestScorer window.
+"Exit TestScorer" exits GUI. To exit R console, close the window.
+
+FOR MORE INFORMATION
+====================
+See the document "TestScorerHelp.pdf" in this directory or in
+the package documentation.
