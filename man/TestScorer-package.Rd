@@ -9,8 +9,8 @@ The main function allows the user to introduce the items of a test or questionna
 \tabular{ll}{
 Package: \tab TestScorer\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2013-04-05\cr
+Version: \tab 1.4\cr
+Date: \tab 2013-11-30\cr
 License: \tab GPL-2\cr
 }
 Main function: \code{\link{TestScorerGUI}}
