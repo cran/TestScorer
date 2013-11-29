@@ -1,10 +1,10 @@
 # RAAS scale scoring script
-# Creation date: 2013-05-13
+# Creation date: 2013-10-09
 # --------------
 
 testChar <- list(acronym = "RAAS",
                  name = "Revised Adult Attachment Scale",
-                 ref = "N. Collins, 1996",
+                 ref = "Collins N, 1996",
                  n.items = 18,
                  valid = c(1, 2, 3, 4, 5),
                  miss = c(0),
@@ -58,8 +58,8 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
     results[1, "Graph"] <- "All missings"
   } else {
     results[1, "Raw"] <- round(mean(answers[items], na.rm=TRUE), 2) # mean answered items
-    if (sex=="Male") results[1, "T"] <- toT(results[1, "Raw"], 21.54, 5.14) # compute T score
-      else results[1, "T"] <- toT(results[1, "Raw"], 21.92, 5.19)
+    if (sex=="Male") results[1, "T"] <- toT(results[1, "Raw"], 3.59, 0.87) # compute T score
+      else results[1, "T"] <- toT(results[1, "Raw"], 3.65, 0.87)
     results[1, "Graph"] <- makeGraph(results[1, "T"]) # make the graph
   }
 
@@ -76,8 +76,8 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
     results[2, "Graph"] <- "All missings"
   } else {
     results[2, "Raw"] <- round(mean(answers[items], na.rm=TRUE), 2) # mean answered items
-    if (sex=="Male") results[2, "T"] <- toT(results[2, "Raw"], 20.59, 5) # compute T score
-      else results[2, "T"] <- toT(results[2, "Raw"], 19.51, 5.14)
+    if (sex=="Male") results[2, "T"] <- toT(results[2, "Raw"], 3.43, 0.83) # compute T score
+      else results[2, "T"] <- toT(results[2, "Raw"], 3.25, 0.86)
     results[2, "Graph"] <- makeGraph(results[2, "T"]) # make the graph
   }
 
@@ -94,16 +94,16 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
     results[3, "Graph"] <- "All missings"
   } else {
     results[3, "Raw"] <- round(mean(answers[items], na.rm=TRUE), 2) # mean answered items
-    if (sex=="Male") results[3, "T"] <- toT(results[3, "Raw"], 13.86, 5.36) # compute T score
-      else results[3, "T"] <- toT(results[3, "Raw"], 15.7, 6.05)
+    if (sex=="Male") results[3, "T"] <- toT(results[3, "Raw"], 2.31, 0.89) # compute T score
+      else results[3, "T"] <- toT(results[3, "Raw"], 2.62, 1.01)
     results[3, "Graph"] <- makeGraph(results[3, "T"]) # make the graph
   }
 
   # Vector for writing scores to a file
   # --------------------
-  results.scores <- unlist(results[-c(1, 2, 6)])
+  results.scores <- unlist(results[-c(1, 2)])  # not Acronym & Scale columns
   names <- paste(results$Acronym, names(results.scores), sep=".")
-  names(results.scores) <- sub("[0-9]+$", "", names)
+  names(results.scores) <- sub("[0-9]+$", "", names)  # delete ending numbers
 
   # Ruler for graph column
   # --------------------
@@ -151,7 +151,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
                             "",
                             paste("Attach style:", style),
                             "",
-                            "T scores computed using mean and standard deviation from 414 USA college students,",
+                            "T-scores computed using mean and standard deviation from 414 USA college students,",
                             "reported by Ledley et al. J Psychopath Behav Assess 2006, 28:33-40."
                             # ===== END ADDITIONAL CODE INSERTED MANUALLY
                       )                            

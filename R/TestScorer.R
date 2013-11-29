@@ -1,6 +1,6 @@
 # ==================================================================================
-# TestScorer 1.3
-# Last modification: 2013-09-25
+# TestScorer 1.4
+# Last modification: 30.11.2013
 # ==================================================================================
 
 # ==================================================================================
@@ -10,7 +10,11 @@
 #   on.item,numEntry()
 #   on.answer.out()
 #   invalid.answer()
-#   on.score()
+#   on.show.record()
+#   on.write()
+#     score.results    called by on.show.record & on.write
+#     show.results     id
+#     write.results    id
 #   on.clean.all()
 #   on.new.test()
 #   on.clean.test()
@@ -47,7 +51,6 @@ if(getRversion() >= '2.15.1') utils::globalVariables(c('scoring.fun', 'testChar'
 TestScorerGUI <- function() {
   # =======================================================
   # Main window
-  #
   # =======================================================
   
   # set a directory
@@ -57,7 +60,7 @@ TestScorerGUI <- function() {
   courrier10 <- tkfont.create(family="courier", size=10)   # font to show items
   arial8 <- tkfont.create(family="arial", size=8)   # font to show test info
   
-  # environments for easier exchanging variable values
+  # environments for exchanging variable values easier
   present.test <- new.env() # environment for: test
   #                                            total.items
   #                                            valid.characters
@@ -69,18 +72,18 @@ TestScorerGUI <- function() {
   #                                       date.test
   #                                       com.sbj
   
-  # top window with three rows: test, id, items
-  # ------------------------------------------------
+  # top window with three columns: test, id, items
+  # -----------------------------------------------
   top <- tktoplevel()
-  tkwm.title(top, 'TestScorer 1.3')
+  tkwm.title(top, 'TestScorer 1.4')
   tkwm.resizable(top, FALSE, FALSE)
   
-  testFrame <- tkframe(top, relief="groove",borderwidth=2)  # col1 for test
-  idFrame <- tkframe(top, relief="groove",borderwidth=2)    # col2 for id
-  respFrame <- tkframe(top, relief="groove",borderwidth=2)  # col3 for items
+  testFrame <- tkframe(top, relief="groove",borderwidth=2)  # col 1 for test
+  idFrame <- tkframe(top, relief="groove",borderwidth=2)    # col 2 for id
+  respFrame <- tkframe(top, relief="groove",borderwidth=2)  # col 3 for items
   tkgrid.configure(testFrame, idFrame, respFrame)
   
-  # test: choose a test
+  # column 1: choose a test
   # --------------------------
   number.of.tests <- length(catalog)
   tests <- character(0)
@@ -89,7 +92,7 @@ TestScorerGUI <- function() {
   which.testFrame <- tkframe(testFrame, relief="groove", borderwidth=2)
   scr <- tkscrollbar(which.testFrame, repeatinterval=5,
                      command=function(...)tkyview(test.selBox,...))
-  test.selBox <- tklistbox(which.testFrame, height=3, width='31',
+  test.selBox <- tklistbox(which.testFrame, height=6, width='31',
                            selectmode='single', yscrollcommand=function(...)tkset(scr,...),
                            background='white', exportselection=F)
   for (i in (1:number.of.tests))
@@ -100,7 +103,7 @@ TestScorerGUI <- function() {
   tkgrid(test.selBox, scr, sticky='nw')
   tkgrid.configure(scr, rowspan=3, sticky='nse')
   
-  # test: where to save scores/items
+  # column 1: where to save scores/items
   # ----------------------------------------------------
   on.nameFile <- function() {    # button function to change file
     choice.top <- tktoplevel()
@@ -153,6 +156,7 @@ TestScorerGUI <- function() {
                      sep="\n")
         tkmessageBox(message=msg)
         name.dir <- tk_choose.dir()
+        
         if (!is.na(name.dir)) {
           # give a name for the file
           a.file <- tktoplevel()
@@ -169,7 +173,7 @@ TestScorerGUI <- function() {
                                      textvariable = nameVar)
           tkgrid(tklabel(nameFrame, text = 'Name for the file:'), nameEntryWidget)
           
-          tkgrid(tklabel(a.file, text="Don't miss the extension!"))
+          tkgrid(tklabel(a.file, text="DON'T MISS THE EXTENSION!"))
           tkgrid(tklabel(a.file, text=''))
           tkfocus(nameEntryWidget)
           donechoiceVar <- tclVar(0) # to stop continuing
@@ -184,8 +188,7 @@ TestScorerGUI <- function() {
           new.file <- tclvalue(nameVar)
           tkgrab.release(a.file)
           tkdestroy(a.file)
-        } else
-          new.file <- ''
+        } else new.file <- ''
         
         if (new.file!='') {
           nameFile <- paste(name.dir, '/', new.file, sep='', collapse='')
@@ -196,9 +199,7 @@ TestScorerGUI <- function() {
                          sep='\n')
             tkmessageBox(message=msg, icon='warning', type='ok')
           }
-        }
-        else
-          nameFile <- ''
+        } else nameFile <- ''
       }
       
       else if (tclvalue(rbChoice)=='exist') {
@@ -210,28 +211,27 @@ TestScorerGUI <- function() {
     
     if (nameFile=='') {  # window canceled
       tclvalue(nameFileVar) <- "Don't save"
+      tkconfigure(showBut, text='      Show results      ')
+      tkconfigure(writeBut, foreground='gray50')
       tkconfigure(YesButton, state='disabled')
       tkconfigure(NoButton, state='disabled')
       msg <- "Choosing a file has been canceled. \nOption is set to don't save."
       tkmessageBox(message=msg, icon='warning', type='ok')
-    } else                   # prevent saving to directory R|Rversion
-      if (substr(nameFile, 1, nchar(R.home()))==R.home()) {
-        msg <- paste("Isn't save to use this directory",
-                     R.home(),
-                     ".Choose an other.",
-                     sep="\n")
-        tkmessageBox(message=msg,  icon='error', type='ok')
-        tclvalue(nameFileVar) <- "Don't save"
-      } else                  # names with TST_ are not allowed
-        if (grepl('^TST_', nameFile)) {
+      } else if (grepl('TST_', nameFile)) {  # names with TST_ are not allowed
           msg <- paste('Names begining with the string "TST_" are not allowed.',
                        'Choose another name.',
                        sep='\n')
           tkmessageBox(message=msg, icon='error', type='ok')
           tclvalue(nameFileVar) <- "Don't save"
-        } else                  # if it is a new file you can continue
-          if (!file.exists(nameFile)) {
+          tkconfigure(showBut, text='     Show results     ')
+          tkconfigure(writeBut, foreground='gray50')
+          tkconfigure(YesButton, state='disabled')
+          tkconfigure(NoButton, state='disabled')
+          
+        } else if (!file.exists(nameFile)) {  # if it is a new file you can continue
             tclvalue(nameFileVar) <- nameFile
+            tkconfigure(showBut, text='Show & write results')
+            tkconfigure(writeBut, foreground='black')
             tkconfigure(YesButton, state='normal')
             tkconfigure(NoButton, state='normal')
           } else {                  # is an existent valid file for test scorer?
@@ -248,6 +248,8 @@ TestScorerGUI <- function() {
                            sep="")
               tkmessageBox(message=msg, icon='error', type='ok')
               tclvalue(nameFileVar) <- "Don't save"
+              tkconfigure(showBut, text='     Show results     ')
+              tkconfigure(writeBut, foreground='gray50')
               tkconfigure(YesButton, state='disabled')
               tkconfigure(NoButton, state='disabled')
             } else {                 # is for this test?
@@ -262,51 +264,54 @@ TestScorerGUI <- function() {
                              sep="")
                 tkmessageBox(message=msg, icon='error', type='ok')
                 tclvalue(nameFileVar) <- "Don't save"
+                tkconfigure(showBut, text='     Show results     ')
+                tkconfigure(writeBut, foreground='gray50')
                 tkconfigure(YesButton, state='disabled')
                 tkconfigure(NoButton, state='disabled')
               } else {                   # the file is valid
-                tclvalue(nameFileVar) <- nameFile
-                tkconfigure(YesButton, state='normal')
-                tkconfigure(NoButton, state='normal')
+                  tclvalue(nameFileVar) <- nameFile
+                  tkconfigure(showBut, text='Show & write results')
+                  tkconfigure(writeBut, foreground='black')
+                  tkconfigure(YesButton, state='normal')
+                  tkconfigure(NoButton, state='normal')
                 }
             }
           }
   }  # end on.nameFile
   
   where.writeFrame <- tkframe(testFrame, relief="groove", borderwidth=2)
-  where.writeFrame2 <- tkframe(testFrame)
-  fileLbl <- tklabel(where.writeFrame2, 
+  fileLbl <- tklabel(where.writeFrame, 
                      text='Where would you like to save scores in tabular format?  ')
-  fileNameBut <- tkbutton(where.writeFrame2,
-                          text='Change option',
-                          command=on.nameFile)
-  tkgrid(where.writeFrame2, sticky='w')
-  tkgrid(fileLbl, fileNameBut, sticky='w')
+  tkgrid(where.writeFrame, sticky='w')
+  tkgrid(fileLbl, sticky='w')
   
   nameFileVar <- tclVar("Don't save")     # initial value
   nameFileEntry <- tklabel(where.writeFrame, text=tclvalue(nameFileVar),
                            width=70)
-  tkgrid(where.writeFrame)
+  
+  fileNameBut <- tkbutton(where.writeFrame,
+                          text='Change\noption',
+                          command=on.nameFile)
   tkconfigure(nameFileEntry, textvariable=nameFileVar, bg='lightgrey',
               relief='groove', borderwidth=2)
-  tkgrid(nameFileEntry, sticky='ew')
-  
+  tkgrid(nameFileEntry, fileNameBut, sticky='ew')
+
+  write.itemsFrame<- tkframe(where.writeFrame)
   write.itemsVar <- tclVar('Yes')
-  would.youFrame <- tkframe(testFrame)
-  tkgrid(would.youFrame, sticky='w')
-  YesButton <- tkradiobutton(would.youFrame, variable=write.itemsVar,
+  YesButton <- tkradiobutton(write.itemsFrame, variable=write.itemsVar,
                              value='Yes')
-  NoButton <- tkradiobutton(would.youFrame, variable=write.itemsVar,
+  NoButton <- tkradiobutton(write.itemsFrame, variable=write.itemsVar,
                             value='No')
   tkconfigure(YesButton, state='disabled')
   tkconfigure(NoButton, state='disabled')
-  tkgrid.configure(tklabel(would.youFrame,
+  tkgrid(write.itemsFrame, sticky='w')
+  tkgrid.configure(tklabel(write.itemsFrame,
                            text='Would you like to save also the items?'),
-                   tklabel(would.youFrame, text='Yes'), YesButton,
-                   tklabel(would.youFrame, text='No'), NoButton,
+                   tklabel(write.itemsFrame, text='Yes'), YesButton,
+                   tklabel(write.itemsFrame, text='No'), NoButton,
                    sticky='w')
   
-  # test: Details (items, valid answers...)
+  # column 1: test details (items, valid answers...)
   # ---------------------------------------------------------------------
   testCharLbl <- tklabel(testFrame, text='Test information')
   testCharEntry <- tktext(testFrame, width=71, height=7,
@@ -314,7 +319,7 @@ TestScorerGUI <- function() {
   tkgrid(testCharLbl, sticky='w')
   tkgrid(testCharEntry, sticky='w')
   
-  # id: age, sex, date & comment
+  # column 2: id, age, sex, date & comment
   # ----------------------------
   idVar <- tclVar('')
   idEntry <- tkentry(idFrame, width='30', textvariable=idVar)
@@ -342,7 +347,7 @@ TestScorerGUI <- function() {
   tkgrid(tklabel(idFrame, text='Comment'), sticky='nw')
   tkgrid(commEntry, sticky='nw')
   
-  # items: box to entry items
+  # column 3: box for entry items
   # -------------------------
   entryFrame <- tkframe(respFrame, relief="groove", borderwidth=2)
   tkgrid(tklabel(entryFrame, text="Entry items window"), sticky='nw')
@@ -357,7 +362,7 @@ TestScorerGUI <- function() {
   tkgrid(item.numEntry, itemEntry)
   tkgrid(entryFrame, sticky='ew')
   
-  # items: window to show items
+  # column 3: window to show items
   # ---------------------------
   itemsFrame <- tkframe(respFrame) # put together items and marginal numbers
   items <- tktext(itemsFrame, bg='lightgrey', font=courrier10,
@@ -407,8 +412,7 @@ TestScorerGUI <- function() {
     tkinsert(testCharEntry,'end','\nMissings: ')
     if (length(catalog[[num.order]][[6]])==0)
       tkinsert(testCharEntry,'end', 'space')
-    else tkinsert(testCharEntry,'end', paste(c(catalog[[num.order]][[6]],
-                                               '& space')))
+    else tkinsert(testCharEntry,'end', paste(catalog[[num.order]][[6]], '& space'))
     tkinsert(testCharEntry,'end','\nComment: ')
     tkinsert(testCharEntry,'end', paste(catalog[[num.order]][[7]]))
     tkconfigure(testCharEntry, state='disabled')
@@ -452,8 +456,7 @@ TestScorerGUI <- function() {
       }
     }
     else invalid.answer(K)       # invalid answer
-    # -------------  now screen is updated
-    # put an asterisk where the new item will be located
+    # screen is updated an asterisk is put where the new item will be located
     items.string.mod <- paste(substr(present.test[['items.string']],
                                      1,
                                      present.test[['next.item']] - 1),
@@ -505,7 +508,7 @@ TestScorerGUI <- function() {
   
   invalid.answer <- function(K)
   { msg <- paste('Answer "', K, '" is invalid.',
-                 '\n\nSee "Test information" for valid answers.',
+                 '\n\nSee "Test information" window for valid answers.',
                  sep='')
     tkmessageBox(message=msg, icon='error')
     tkfocus(itemEntry)
@@ -513,9 +516,19 @@ TestScorerGUI <- function() {
   
   # buttons: functions and position
   # -------------------------------
-  on.score <- function() {
+  on.show.and.record <- function(){
+    results <- score.results()  # results: list(results.lst, results.df, results.scores, answers)
+    show.results(results[[1]], results[[2]])  # show on console
+    if (tclvalue(nameFileVar) != "Don't save") write.results(results[[3]], results[[4]])  # record results to file
+  }  # end on.show.record
+  
+  on.write <- function(){
+    results <- score.results() # # results: list(results.lst, results.df, results.scores, answers)
+    write.results(results[[3]], results[[4]]) # save results to file
+  }
+  
+  score.results <- function() {
     # reads identification and answer from tktcl
-    tkconfigure(top, cursor='watch')
     assign('id', tclvalue(idVar), envir=subject)
     assign('age', tclvalue(ageVar), envir=subject)
     assign('sex', tclvalue(sexVar), envir=subject)
@@ -537,8 +550,13 @@ TestScorerGUI <- function() {
     results.lst <- results$results.lst
     results.df <- results$results.df
     results.scores <- results$results.scores
+    return(list(results.lst=results.lst,
+                results.df=results.df, 
+                results.scores=results.scores,
+                answers=answers))
+  }  # end score.results 
     
-    # shows results on console
+  show.results <- function(results.lst, results.df){
     options(width=100)  # assures enough wide
     cat('\n\n')
     cat('----------------------',
@@ -552,9 +570,10 @@ TestScorerGUI <- function() {
     for (i in 1:length(results.lst))
       cat(results.lst[[i]], '\n')
     cat('\n')
-    print(results.df, right=FALSE, row.names=FALSE)
-    
-    # writes results to file
+    print(results.df, right=FALSE, row.names=FALSE, na.print='-')
+  }  # end show.results
+  
+  write.results <- function(results.scores, answers){
     if (tclvalue(nameFileVar) != "Don't save") {
       the.file.exists <- file.exists(tclvalue(nameFileVar))
       
@@ -567,12 +586,12 @@ TestScorerGUI <- function() {
                          date=subject[['date.test']],
                          obs=subject[['comm.sbj']])
       options(warn=0)
-        
+      
       # case = id + results
       if (is.data.frame(results.scores))
-        case <- cbind(case, results.scores) ## scripts from v.1.1
-      else case <- cbind(case, t(results.scores)) ## scripts v.1.2 and later
-        
+        case <- cbind(case, results.scores) # scripts v.1.1
+      else case <- cbind(case, t(results.scores)) # scripts v.1.2 and later
+      
       # case = id + results + items     
       if (tclvalue(write.itemsVar)=='Yes') {
         if (the.file.exists) { # if file exists, cheks if items are admited
@@ -583,30 +602,33 @@ TestScorerGUI <- function() {
                          "To save items use an other (existing or new created) file,",
                          "with the save items option checked.",
                          sep="\n")
-                         tkmessageBox(message=msg, icon='warning')
+            tkmessageBox(message=msg, icon='warning')
             tclvalue(write.itemsVar) <- 'No'
           } else case <- cbind(case, i=t(as.numeric(answers)))
         } else case <- cbind(case, i=t(as.numeric(answers)))
       }
-                           
+      
       if (!the.file.exists) {  # if new file, write the vars names
         write.table(case, tclvalue(nameFileVar), row.names=F,
-                    sep=';', na='', quote=FALSE)
+                    sep=';', na='', quote=TRUE)
       } else { write.table(case, tclvalue(nameFileVar), append=TRUE,
-                           row.names=F, col.names=F, sep=';', na='', quote=FALSE)
+                           row.names=F, col.names=F, sep=';', na='', quote=TRUE)
       }
       rm(case, inherits=TRUE)   # to avoid dragging
+      msg <- 'Test has been recorded.'
+      tkmessageBox(message=msg, icon='info')
     }  # end if... write to file
-	
-    tkconfigure(top, cursor='arrow')
-  }  # end on.score
-                           
+    else {msg <- 'First choose a file where to write the resuts.'
+          tkmessageBox(message=msg, icon='error')}
+  }  # end write.results
+  
   on.clean.all <- function() { 	# cleans id & items
     tkdelete(idEntry, 0, 'end')
     tkdelete(ageEntry, 0, 'end')
     tkdelete(dateEntry, 0, 'end')
     tkdelete(commEntry, 0, 'end')
     tkdelete(itemEntry, 0, 'end')
+    tclvalue(sexVar) <- 'Male'
     initialize.test(as.numeric(tkcurselection(test.selBox))+1)
     tclvalue(item.numVar) <- 'Item to enter: 1  -->'
     tkconfigure(top, cursor='arrow')  # if clock-cursor remains
@@ -615,6 +637,10 @@ TestScorerGUI <- function() {
   on.new.test <- function() {
     if (tclvalue(nameFileVar)!="Don't save") {
       tclvalue(nameFileVar) <- "Don't save"
+      tclvalue(write.itemsVar) <- 'Yes'
+      tkconfigure(showBut, text='     Show results     ')
+      tkconfigure(YesButton, state='disabled')
+      tkconfigure(NoButton, state='disabled')
       msg <- paste("The file for saving scores is no longer valid for the new test.",
                    "Saving results has been reseted to \"Don't save\".",
                    "Select an other file if appropiate.",
@@ -709,24 +735,26 @@ TestScorerGUI <- function() {
   }  # end on.manager
         
   # frame for buttons
-  botFrame <- tkframe(top)
-  correcteBut <- tkbutton(botFrame,text="      Score      ",command=on.score)
-  cleanTestBut <- tkbutton(botFrame,text=" Clean items ",command=on.clean.test)
-  cleanAllBut <- tkbutton(botFrame,text="  Clean all   ",command=on.clean.all)
-  exitBut <- tkbutton(botFrame,text="Exit TestScorer",command=on.exit)
-  helpBut <- tkbutton(botFrame, text="      Help      ", command=on.help)
-  managerBut <- tkbutton(botFrame, text="Test Manager", command=on.manager)
-  tkgrid(botFrame, columnspan=3)
-  tkgrid(correcteBut, cleanTestBut, cleanAllBut, managerBut, helpBut, exitBut)
+  buttFrame <- tkframe(top)
+  showBut <- tkbutton(buttFrame, text="      Show results      ", command=on.show.and.record)
+  writeBut <- tkbutton(buttFrame, text="    Only write    ",
+                        foreground='gray50', command=on.write)
+  cleanTestBut <- tkbutton(buttFrame, text=" Clean items ", command=on.clean.test)
+  cleanAllBut <- tkbutton(buttFrame, text="  Clean all   ", command=on.clean.all)
+  exitBut <- tkbutton(buttFrame, text="Exit TestScorer", command=on.exit)
+  helpBut <- tkbutton(buttFrame, text="      Help      ", command=on.help)
+  managerBut <- tkbutton(buttFrame, text="Test Manager", command=on.manager)
+  tkgrid(buttFrame, columnspan=3)
+  tkgrid(showBut, writeBut, cleanTestBut, cleanAllBut, managerBut, helpBut, exitBut)
         
   # frame for instructions
   # ----------------------
   notabeneFrame <- tkframe(top, relief="groove", borderwidth=2)
   tkgrid(notabeneFrame, columnspan=3)
   tkgrid(tklabel(notabeneFrame, text='Gray windows are non-editable.'))
-  tkgrid(tklabel(notabeneFrame, text='To introduce the items, click on the white box in "Entry items window" . Then enter the answers.'))
+  tkgrid(tklabel(notabeneFrame, text='To introduce the items, put the cursor inside the white box in "Entry items window". Then enter the answers using numerical keys.'))
   tkgrid(tklabel(notabeneFrame, text='You can use the arrow keys to skip between items. Do NOT use "backspace".'))
-  tkgrid(tklabel(notabeneFrame, text='Use the R console menu option "File" to print the results.'))
+  tkgrid(tklabel(notabeneFrame, text='Use the R console menu option "File" to print or save the results.'))
   tkgrid(tklabel(notabeneFrame, text='Click help for more detailed instructions.'))
         
   # key interception
@@ -1094,7 +1122,7 @@ add.new.test <- function() {
     tkgrid(tklabel(top.test, text=' '))
     frameName <- tkframe(top.test)
     assign('nameTestVal', tclVar(""), envir=test.char)
-    entry.nameTest <- tkentry(frameName ,width="40", textvariable=test.char[['nameTestVal']])
+    entry.nameTest <- tkentry(frameName , width="40", textvariable=test.char[['nameTestVal']])
     tkgrid(frameName, sticky='w')
     tkgrid(tklabel(frameName, text="Enter the name of the test (optional)"), entry.nameTest, sticky='w')
     
@@ -1374,7 +1402,7 @@ add.new.test <- function() {
           file='tmp', append=TRUE)
     }
     
-    cat('\n  results <- data.frame(NULL) # Null data frame for results', file='tmp', append=TRUE)
+    cat('\n  results <- data.frame(NULL) # Initialize null data frame for results', file='tmp', append=TRUE)
     
     if (trans=='Tmean') {
       cat('\n\n  toT <- function(raw.score, mean, sd) {  # compute T score' , file='tmp', append=TRUE)
@@ -1387,7 +1415,7 @@ add.new.test <- function() {
       cat('\n\n  makeGraph <- function(T.score) {  # make a graph' , file='tmp', append=TRUE)
       cat('\n    template  <- "|    :    :    |    :    |    :    |    :    :    |"' , file='tmp', append=TRUE)
       cat('\n    options(warn=-1)', file='tmp', append=TRUE)
-      cat('\n    T.score <- as.integer(T.score)  # in case of numerical string', file='tmp', append=TRUE)
+      cat('\n    T.score <- as.integer(T.score)  # NA in case of non-numerical string', file='tmp', append=TRUE)
       cat('\n    options(warn=0)', file='tmp', append=TRUE)
       cat('\n    if (!is.na(T.score)) {', file='tmp', append=TRUE)
       cat('\n      if (T.score < 0) T.score <- 0' , file='tmp', append=TRUE)
@@ -1512,9 +1540,9 @@ add.new.test <- function() {
       return(is.OkScale)
     }  # end ValidateScaleChar
     
-    # ---- window scale
+    # ---- window for scale
     top.scale <- tktoplevel()
-    tkwm.title(top.scale, paste("Definition of scale", scale.num))
+    tkwm.title(top.scale, paste("Definition of scale number", scale.num))
     tkwm.resizable(top.scale, FALSE, FALSE)
     
     # Acronym
@@ -1630,7 +1658,7 @@ add.new.test <- function() {
         tkgrid(table, yscr)
         tkgrid.configure(yscr, sticky="nsw")
         tkconfigure(table, variable=tclArrayTrans, selectmode="single", background="white")
-        tkgrid(tklabel(trans.win, text='Note: "-" will be automatically removed.'))
+        tkgrid(tklabel(trans.win, text='Note: "-" sign will be automatically removed.'))
         
         # Ok trans table
         tkgrid(tklabel(trans.win, text=' '))
@@ -1875,7 +1903,7 @@ add.new.test <- function() {
     if (graph=='yes')
       cat(paste('\n    results[',
                 scale.num,
-                ', "Graph"] <- "All missings"',
+                ', "Graph"] <- "All items missing"',
                 sep=''),
           file='tmp', append=TRUE)
     
@@ -1942,7 +1970,7 @@ add.new.test <- function() {
       
     } else if ((trans=='Ttable' | trans=='Other') & equal=='no') {
       # build vector trans.males.tabel
-      cat('\n  # Vector for score transformation', file='tmp', append=TRUE)
+      cat('\n    # Vector for score transformation', file='tmp', append=TRUE)
       if (scale.char[['trans.is.numeric']]=='yes') {
         cat('\n    trans.males.table <- c(', file='tmp', append=TRUE)
         if (length(trans.males)>1)
@@ -2092,15 +2120,15 @@ add.new.test <- function() {
     cat('\n\n  # Vector for writing scores to a file', file='tmp', append=TRUE)
     cat('\n  # --------------------', file='tmp', append=TRUE)
     if (graph=='no') {
-      cat('\n  results.scores <- unlist(results[-c(1, 2)])',
+      cat('\n  results.scores <- unlist(results[-c(1, 2)])  # not Acronym & Scale columns',
           file='tmp', append=TRUE)
     } else {
-      cat('\n  results.scores <- unlist(results[-c(1, 2, 6)])',
+      cat('\n  results.scores <- unlist(results[-c(1, 2, 6)])  # not Acronym & Scale columns',
           file='tmp', append=TRUE)
     }
     cat('\n  names <- paste(results$Acronym, names(results.scores), sep=".")',
         file='tmp', append=TRUE)
-    cat('\n  names(results.scores) <- sub("[0-9]+$", "", names)',
+    cat('\n  names(results.scores) <- sub("[0-9]+$", "", names)  # delete ending numbers',
         file='tmp', append=TRUE)
     
     if (graph=='yes') {
@@ -2216,7 +2244,7 @@ add.new.test <- function() {
     try(dummy <- file.remove('tmp'))
     options(warn=0)
   }
-  TestScorerGUI() # returns to main GUI
+  TestScorerGUI() # reopenss the main GUI, updating the catalog
   
 } # end add.new.test ======================================
       
@@ -2224,8 +2252,8 @@ delete.test <- function() {
   # ==================================================================================
   # delete.test
   #
-  # 1 Looks directory for tests
-  # 2 Delete
+  # 1 Looks at directory for existing tests
+  # 2 Delete one of them
   # ==================================================================================
   content <- dir() # looks for test files
   existing.tests <- content[grep('TST_.+\\.r$', content)]
@@ -2267,6 +2295,6 @@ delete.test <- function() {
                  icon='warning', type='ok')
   }
   
-  TestScorerGUI() # call TestScoreGUI, updating the catalog
+  TestScorerGUI() # reopenss the main GUI, updating the catalog
 } # end detete test
       

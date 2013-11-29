@@ -4,7 +4,7 @@
 
 testChar <- list(acronym = "DASS",
                  name = "Depression Anxiety Stress Scales",
-                 ref = "SH Lovibond & PF Lovibond, 1995",
+                 ref = "Lovibond SH & Lovibond PF, 1995",
                  n.items = 42,
                  valid = c(0, 1, 2, 3),
                  miss = c(4),
@@ -31,7 +31,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
     results[1, "Centil"] <- NA
   } else {
     results[1, "Raw"] <- sum(answers[items], na.rm=TRUE) # sum answered items
-  # Vector for score transformation
+    # Vector for score transformation
     trans.table <- c("5-20", "25-35", "40-45", "50-55", "60", "65", "70", "75", "76-78", "79-81", "82-83", "84-85", "86", "87", "88-89", "90", "91", "92", "93", "93", "94", "94", "95", "95", "96", "96", "96", "97", "97", "97", "97", "98", "98", "98", "98", "98", "99", "99", "99", "99", "99", "99", "99")
     index <- results[1, "Raw"]
     index <- 1 + index  # 1, because raw scores begin at 0
@@ -50,7 +50,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
     results[2, "Centil"] <- NA
   } else {
     results[2, "Raw"] <- sum(answers[items], na.rm=TRUE) # sum answered items
-  # Vector for score transformation
+    # Vector for score transformation
     trans.table <- c("5-30", "35-45", "50-55", "60-65", "70-75", "76-79", "80-83", "84-86", "87-89", "90", "91", "92", "93", "94", "94", "95", "95", "96", "96", "96", "97", "97", "98", "98", "98", "98", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99")
     index <- results[2, "Raw"]
     index <- 1 + index  # 1, because raw scores begin at 0
@@ -69,7 +69,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
     results[3, "Centil"] <- NA
   } else {
     results[3, "Raw"] <- sum(answers[items], na.rm=TRUE) # sum answered items
-  # Vector for score transformation
+    # Vector for score transformation
     trans.table <- c("5", "10", "15", "20-25", "30", "35", "40", "45", "50-55", "60", "65", "65", "70", "75-77", "78-80", "81-82", "83-84", "85-86", "87-88", "89", "90", "91", "92", "93", "93", "94", "95", "95", "96", "96", "97", "97", "97", "97", "98", "98", "98", "99", "99", "99", "99", "99", "99")
     index <- results[3, "Raw"]
     index <- 1 + index  # 1, because raw scores begin at 0
@@ -78,9 +78,9 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
 
   # Vector for writing scores to a file
   # --------------------
-  results.scores <- unlist(results[-c(1, 2)])
+  results.scores <- unlist(results[-c(1, 2)])  # not Acronym & Scale columns
   names <- paste(results$Acronym, names(results.scores), sep=".")
-  names(results.scores) <- sub("[0-9]+$", "", names)
+  names(results.scores) <- sub("[0-9]+$", "", names)  # delete ending numbers
 
   # Output in form of list
   # ------------------
@@ -90,9 +90,12 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
                             pcnt.blanks,
                             "%)",
                             sep=""),
-                       paste("\nNormative data from a non-clinical British sample. Data from",
-                             "JR Crawford. & JD Henry, Br J Clin Psychol 2003, 42:111-131.",
-                             sep='\n'))
+                      # ===== ADDITIONAL CODE INSERTED MANUALLY
+                      paste("\nNormative data from a non-clinical British sample. Data from",
+                            "JR Crawford. & JD Henry, Br J Clin Psychol 2003, 42:111-131.",
+                            sep='\n')
+                      # ===== END ADDITIONAL CODE INSERTED MANUALLY
+                     )
 
   # Return results
   # ------------------

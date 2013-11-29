@@ -69,29 +69,31 @@ window will alert you of the invalid choice.
 
 4. Scoring the test
 -------------------
-When you have entered all the answers press the "Score" 
-button to get the results which appear on the R's main 
-window. From the R's menu bar you can print or save the 
-results.
+When you have entered all the answers press the "Show (& write)
+results" button to show (and write into a file if this options
+has been choosen) the results on the R's console. From the 
+R's menu bar you can print or save this results. "Only write"
+scores the test without showing it on the console, but 
+recording the results on a file as explained in the next
+paragraph.
 
 5. Recording scores and answers to a file
 -----------------------------------------
 It is possible to record the items and scores of the tests in 
 a file for further statistical analysis. To do so, click on 
-the button labeled "Click here to choose a file for saving 
-the results". This opens a system window for choosing or 
-creating a file for recording. If the file already exists the 
-new information will be appended. The chosen file will be 
-showed in the window labeled "Where would you like to save 
-the scores?". Some tests are carried out to enssure that the 
-old file structure is compatible with the new data, but the 
-user must be careful and take the necessary precautions 
+the button labeled "Change option". This opens a system window
+for choosing or creating a file for recording. If the file 
+already exists the new information will be appended. The chosen
+file will be showed in the window labeled "Where would you like
+to save the scores?". Some tests are carried out to ensure
+that the old file structure is compatible with the new data,
+but the user must be careful and take the necessary precautions 
 themselves. The radio buttons beneath the "Would you like to 
 save the items" label allow recording the answers (as 
 introduced through the keyboard without further processing) 
 in addition to the scores.
 
-The data are written to an ascii text file with semicolons
+The data are written to an ASCII text file with semicolons
 between fields as delimiters. These kinds of file are easily
 imported by almost any program and also by R.
 
@@ -99,7 +101,8 @@ OTHER BUTTONS
 =============
 At the bottom of the screen you will find different buttons:
  
-"Score" is for scoring as explained previously.
+"Show (& write) results" and "Only write" are for scoring
+    and saving as explained previously.
 
 "Clean Items", cleans the items but maintains the 
     identification information of the subject. So you can 
@@ -109,9 +112,8 @@ At the bottom of the screen you will find different buttons:
 "Clean all", cleans both the items and the identification data.
 
 "Test manager" creates instructions for scoring a new test or
-    deletes ones already existent. See the document
-    "TestScorerHelp.pdf" which you can find in this directory.
-    
+    deletes a test already existent.
+
 "Help" shows this document.
 
 "Exit TestScorer" exits GUI. To exit R console, close the window.

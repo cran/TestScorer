@@ -4,7 +4,7 @@
 
 testChar <- list(acronym = "MHLC",
                  name = "Multidimensional Health Locus of Control",
-                 ref = "Wallston, Wallston & DeVelis, 1978",
+                 ref = "Wallston KA, Wallston BS & DeVelis R, 1978",
                  n.items = 18,
                  valid = c(1, 2, 3, 4, 5, 6),
                  miss = c(0),
@@ -48,7 +48,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   # P scale scoring commands
   # --------------
   results[3, "Acronym"] <- "P" # acronym
-  results[3, "Scale"] <- "Pwerful Others" # name of the scale
+  results[3, "Scale"] <- "Powerful Others" # name of the scale
   # Items making up the scale
   items <- c(3, 5, 7, 10, 14, 18)
   results[3, "Miss"] <- sum(is.na(answers[items])) # number of missings
@@ -60,9 +60,9 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
 
   # Vector for writing scores to a file
   # --------------------
-  results.scores <- unlist(results[-c(1, 2)])
+  results.scores <- unlist(results[-c(1, 2)])  # not Acronym & Scale columns
   names <- paste(results$Acronym, names(results.scores), sep=".")
-  names(results.scores) <- sub("[0-9]+$", "", names)
+  names(results.scores) <- sub("[0-9]+$", "", names)  # delete ending numbers
 
   # Output in form of list
   # ------------------
