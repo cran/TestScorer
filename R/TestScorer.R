@@ -1,6 +1,6 @@
 # ==================================================================================
-# TestScorer 1.4
-# Last modification: 30.11.2013
+# TestScorer 1.5
+# Last modification: 2014.02.04
 # ==================================================================================
 
 # ==================================================================================
@@ -34,10 +34,14 @@
 #     validate.test()
 #     OnOkTest()
 #   write.test.begining()
-#   make.scale.window()       <- | loop for each scale
-#        ValidateScaleChar()     |
-#        make.table.win()        |
-#   write.scale()             <- |
+#   make.scale.window()   <----------------------------|
+#        scale.characteristics                         |
+#        validate.scale.char                           |
+#        write.scale.begining                          |
+#            trans.winow      <-|                      | loop for each scale
+#            validate.trans     | loop for each trans  |
+#            write.trans      <-|                      |
+#   write.scale.end       <----------------------------|
 #   write.test.end()
 #   MAIN
 #
@@ -75,7 +79,7 @@ TestScorerGUI <- function() {
   # top window with three columns: test, id, items
   # -----------------------------------------------
   top <- tktoplevel()
-  tkwm.title(top, 'TestScorer 1.4')
+  tkwm.title(top, 'TestScorer 1.5')
   tkwm.resizable(top, FALSE, FALSE)
   
   testFrame <- tkframe(top, relief="groove",borderwidth=2)  # col 1 for test
@@ -132,7 +136,9 @@ TestScorerGUI <- function() {
     OkDoneChoice.but <- tkbutton(choice.top, text='   OK   ',
                                  command=function() tclvalue(donechoiceVar) <- 1)
     tkgrid(OkDoneChoice.but)
-    tkgrid(tklabel(choice.top, text='Close this window to cancel the action.'))
+    tkgrid(tklabel(choice.top, text=paste('Close this window to cancel the action.',
+                                          'Option will be set to "Don\'t save".',
+                                          sep='\n')))
     tkbind(choice.top, '<Destroy>', function() tclvalue(donechoiceVar) <- 3)
     tkfocus(choice.top)         # Place the focus to this tk window
     tkwait.variable(donechoiceVar)
@@ -143,8 +149,10 @@ TestScorerGUI <- function() {
     nameFile=''
     if (doneChoice==1) {
       # choice don't save
-      if (tclvalue(rbChoice)=='dont')
+      if (tclvalue(rbChoice)=='dont') {
         tclvalue(nameFileVar) <- "Don't save"
+        tclvalue(write.itemsVar) <- 'Yes'
+      }
       
       else if (tclvalue(rbChoice)=='new') {
         # choice new
@@ -211,11 +219,12 @@ TestScorerGUI <- function() {
     
     if (nameFile=='') {  # window canceled
       tclvalue(nameFileVar) <- "Don't save"
+      tclvalue(write.itemsVar) <- 'Yes'
       tkconfigure(showBut, text='      Show results      ')
       tkconfigure(writeBut, foreground='gray50')
       tkconfigure(YesButton, state='disabled')
       tkconfigure(NoButton, state='disabled')
-      msg <- "Choosing a file has been canceled. \nOption is set to don't save."
+      msg <- "Choosing a file has been canceled. \nOption is set to \"Don't save\"."
       tkmessageBox(message=msg, icon='warning', type='ok')
       } else if (grepl('TST_', nameFile)) {  # names with TST_ are not allowed
           msg <- paste('Names begining with the string "TST_" are not allowed.',
@@ -223,6 +232,7 @@ TestScorerGUI <- function() {
                        sep='\n')
           tkmessageBox(message=msg, icon='error', type='ok')
           tclvalue(nameFileVar) <- "Don't save"
+          tclvalue(write.itemsVar) <- 'Yes'
           tkconfigure(showBut, text='     Show results     ')
           tkconfigure(writeBut, foreground='gray50')
           tkconfigure(YesButton, state='disabled')
@@ -248,6 +258,7 @@ TestScorerGUI <- function() {
                            sep="")
               tkmessageBox(message=msg, icon='error', type='ok')
               tclvalue(nameFileVar) <- "Don't save"
+              tclvalue(write.itemsVar) <- 'Yes'
               tkconfigure(showBut, text='     Show results     ')
               tkconfigure(writeBut, foreground='gray50')
               tkconfigure(YesButton, state='disabled')
@@ -264,6 +275,7 @@ TestScorerGUI <- function() {
                              sep="")
                 tkmessageBox(message=msg, icon='error', type='ok')
                 tclvalue(nameFileVar) <- "Don't save"
+                tclvalue(write.itemsVar) <- 'Yes'
                 tkconfigure(showBut, text='     Show results     ')
                 tkconfigure(writeBut, foreground='gray50')
                 tkconfigure(YesButton, state='disabled')
@@ -368,11 +380,11 @@ TestScorerGUI <- function() {
   items <- tktext(itemsFrame, bg='lightgrey', font=courrier10,
                   height=10, width='10')
   tkconfigure(items, state='disabled')
-  itemsText <- tktext(itemsFrame,bg='lightgrey',font=courrier10,
+  itemsText <- tktext(itemsFrame, bg='lightgrey', font=courrier10,
                       height=10, width='7')                    # row lbl
-  tkinsert(itemsText,'end',
+  tkinsert(itemsText, 'end',
            paste(seq(1, 91, 10), '-', seq(10, 100, 10), '\n', 
-                 sep='', collapse='')) #lbl files
+                 sep='', collapse='')) # lbl rows
   tkconfigure(itemsText, state='disabled')
   tkgrid(tklabel(itemsFrame, text='1234567890', 
                  font=courrier10)) # columns lbl
@@ -470,7 +482,7 @@ TestScorerGUI <- function() {
     # computes the values of the rows
     tkconfigure(itemsText, state='normal')
     tkdelete(itemsText, '0.0', 'end')
-    tkinsert(itemsText,'end',
+    tkinsert(itemsText, 'end',
              paste(seq(hundred*100+1, hundred*100+91, 10), '-',
                    seq(hundred*100+10, hundred*100+100, 10), '\n',
                    sep='',
@@ -563,10 +575,11 @@ TestScorerGUI <- function() {
         sub('^TST_', '',
             present.test[['test']]),
         '-----------------------\n')
-    cat('Identification:', subject[['id']], 'Sex:', subject[['sex']],
-        'Age:', subject[['age']], '\n')
-    cat('Date:', subject[['date.test']], 'Comment:', subject[['comm.sbj']],
-        '\n\n')
+    cat('Subject:', subject[['id']], '\n')
+    cat('Sex:', subject[['sex']], '\n')
+    cat('Age:', subject[['age']], '\n')
+    cat('Date:', subject[['date.test']], '\n')
+    cat('Comment:', subject[['comm.sbj']], '\n\n')
     for (i in 1:length(results.lst))
       cat(results.lst[[i]], '\n')
     cat('\n')
@@ -615,10 +628,12 @@ TestScorerGUI <- function() {
                            row.names=F, col.names=F, sep=';', na='', quote=TRUE)
       }
       rm(case, inherits=TRUE)   # to avoid dragging
-      msg <- 'Test has been recorded.'
+      msg <- 'Test scores has been recorded.'
       tkmessageBox(message=msg, icon='info')
     }  # end if... write to file
-    else {msg <- 'First choose a file where to write the resuts.'
+    else {msg <- paste('First choose a file where to write the resuts.',
+                       'Use the "Cange option" button.',
+                       sep='\n')
           tkmessageBox(message=msg, icon='error')}
   }  # end write.results
   
@@ -629,16 +644,15 @@ TestScorerGUI <- function() {
     tkdelete(commEntry, 0, 'end')
     tkdelete(itemEntry, 0, 'end')
     tclvalue(sexVar) <- 'Male'
-    initialize.test(as.numeric(tkcurselection(test.selBox))+1)
-    tclvalue(item.numVar) <- 'Item to enter: 1  -->'
-    tkconfigure(top, cursor='arrow')  # if clock-cursor remains
-  }  # end on.clean
+    on.clean.test()
+  }  # end on.clean.all
                            
   on.new.test <- function() {
     if (tclvalue(nameFileVar)!="Don't save") {
       tclvalue(nameFileVar) <- "Don't save"
       tclvalue(write.itemsVar) <- 'Yes'
       tkconfigure(showBut, text='     Show results     ')
+      tkconfigure(writeBut, foreground='gray50')
       tkconfigure(YesButton, state='disabled')
       tkconfigure(NoButton, state='disabled')
       msg <- paste("The file for saving scores is no longer valid for the new test.",
@@ -651,11 +665,17 @@ TestScorerGUI <- function() {
     on.clean.test()
   }  # end on.new.test
         
-  on.clean.test <- function() { 	# clean items
+  on.clean.test <- function() { 	# clean test items
     tkdelete(itemEntry, 0, 'end')
     initialize.test(as.numeric(tkcurselection(test.selBox))+1)
     tclvalue(item.numVar) <- 'Item to enter: 1  -->'
-    tkconfigure(top, cursor='arrow')  # if clock-cursor remains
+    tkconfigure(itemsText, state='normal')
+    tkdelete(itemsText, '0.0', 'end')
+    tkinsert(itemsText, 'end',
+             paste(seq(1, 91, 10), '-', seq(10, 100, 10), '\n', 
+                   sep='', collapse='')) # lbl rows
+    tkconfigure(itemsText, state='disabled')
+    tkgrid(items, itemsText)
   }  # end on.clean.test
         
   on.exit <- function() {
@@ -914,6 +934,7 @@ add.new.test <- function() {
   #                                          transVal
   #                                          equalVal
   #                                          graphVal
+  #                                          n.age.groups
   #                                          name.transVal
   #                                          trans.is.numeric
   assign('trans.is.numeric', 'yes', envir=test.char)  # initialize
@@ -930,6 +951,8 @@ add.new.test <- function() {
       tkconfigure(rb.equal.yes, variable=test.char[['equalVal']], state='disabled')
       tkconfigure(rb.equal.no, variable=test.char[['equalVal']], state='disabled')
       tkconfigure(entry.name, textvariable=test.char[['name.transVal']], state='disabled')
+      assign('n.age.groupsVal', tclVar('1'), envir=test.char)
+      tkconfigure(entry.n.age.groups, textvariable=test.char[['n.age.groupsVal']], state='disabled')
     } # end no.trans
     
     other.trans <- function() {
@@ -947,6 +970,8 @@ add.new.test <- function() {
       tkconfigure(rb.equal.no, state='normal')
       assign('name.transVal', tclVar('Centil'), envir=test.char)
       tkconfigure(entry.name, textvariable=test.char[['name.transVal']], state='normal')
+      assign('n.age.groupsVal', tclVar('1'), envir=test.char)
+      tkconfigure(entry.n.age.groups, textvariable=test.char[['n.age.groupsVal']], state='normal')
     }  # end other.trans
     
     Tmean.trans <- function() {
@@ -956,6 +981,8 @@ add.new.test <- function() {
       tkconfigure(rb.graph.no, state='normal')
       assign('name.transVal', tclVar('Centil'), envir=test.char)
       tkconfigure(entry.name, textvariable=test.char[['name.transVal']], state='disabled')
+      assign('n.age.groupsVal', tclVar('1'), envir=test.char)
+      tkconfigure(entry.n.age.groups, textvariable=test.char[['n.age.groupsVal']], state='normal')
     }  # end Tmean.trans
     
     Ttable.trans <- function() {
@@ -970,6 +997,8 @@ add.new.test <- function() {
       tkconfigure(rb.graph.no, state='normal')
       assign('name.transVal', tclVar('Centil'), envir=test.char)
       tkconfigure(entry.name, textvariable=test.char[['name.transVal']], state='disabled')
+      assign('n.age.groupsVal', tclVar('1'), envir=test.char)
+      tkconfigure(entry.n.age.groups, textvariable=test.char[['n.age.groupsVal']], state='normal')
     }  # end Ttable.trans
     
     # Activate/deactivate prorrating of missings in case of sum
@@ -1095,6 +1124,25 @@ add.new.test <- function() {
         is.OkTest <- 'no'
         tkmessageBox(message="Number of scales is not valid.", icon="error", type="ok")
       }
+   
+      # number of age groups
+      n.age.groups <- as.numeric(tclvalue(test.char[['n.age.groupsVal']]))
+      if (is.na(n.age.groups) | grepl('\\.', n.age.groups)) {  # should be an integer
+        is.OkTest <- 'no'
+        tkmessageBox(message="Age-groups is not an integer.", icon="error", type="ok")
+      }
+      
+      else if (n.age.groups == 0) {
+        is.OkTest <- 'no'
+        tkmessageBox(message="Age-groups should be at least 1.", icon="error", type="ok")
+      }
+      ######## NOT IMPLEMENTED YET
+      else if (n.age.groups > 1) {
+        # is.OkTest <- 'no'
+        assign('n.age.groupsVal', tclVar('1'), envir=test.char)
+        tkconfigure(entry.n.age.groups, textvariable=test.char[['n.age.groupsVal']], state='normal')
+        tkmessageBox(message="Sorry, norms only implementet as yet for one group.", icon="error", type="ok")
+      }
       
       options(warn=0)
       return(is.OkTest)
@@ -1168,7 +1216,7 @@ add.new.test <- function() {
     tkgrid(tklabel(frameValid, text="Valid answers"), entry.valid, sticky='w')
     tkgrid(tklabel(frame.left, text=paste("Note: Can be any number.",
                                           "Do NOT include the missing values here",
-                                          "(e.g.: 1 2, 3).")), sticky='w')
+                                          "(e.g.: 1,2,3).")), sticky='w')
     tkgrid(tklabel(frame.left, text="Use only letters separated by commas."), sticky='w')
     
     # Missing
@@ -1189,8 +1237,8 @@ add.new.test <- function() {
     entry.reversed <- tkentry(frameReversed, width="60", textvariable=test.char[['reversedVal']])
     tkgrid(frameReversed, sticky='w')
     tkgrid(tklabel(frameReversed, text="Reversed items"), entry.reversed, sticky='w')
-    tkgrid(tklabel(frame.left, text=paste("Note: Left blank if any item need to be reversed.",
-                                          "Use commas to separate the numbers.")), sticky='w')
+    tkgrid(tklabel(frame.left, text=paste("Note: Left blank if none of the items should be reversed.",
+                                          "Otherwise, use commas to separate the numbers.")), sticky='w')
     # Form of scoring the scales
     tkgrid(tklabel(frame.left, text=' '))
     frameScoring <- tkframe(frame.left)
@@ -1236,7 +1284,9 @@ add.new.test <- function() {
     assign('graphVal', tclVar('no'), envir=test.char)
     assign('equalVal', tclVar('no'), envir=test.char)
     assign('name.transVal', tclVar('Centil'), envir=test.char)
+    assign('n.age.groupsVal', tclVar('1'), envir=test.char)
     entry.name <- tkentry(frame.rigth, width='5', textvariable=test.char[['name.transVal']], state='disabled')
+    entry.n.age.groups <- tkentry(frame.rigth, width='1', textvariable=test.char[['n.age.groupsVal']], state='disabled')
     tkconfigure(rb.trans.No, variable=test.char[['transVal']], value="no", command=no.trans)
     tkconfigure(rb.trans.Tmean, variable=test.char[['transVal']], value="Tmean", command=Tmean.trans)
     tkconfigure(rb.trans.Ttable, variable=test.char[['transVal']], value="Ttable", command=Ttable.trans)
@@ -1254,10 +1304,12 @@ add.new.test <- function() {
     tkgrid(tklabel(frame.rigth, text="        Choose a name, e.g.: 'Centil'"),
            entry.name, sticky='w')
     tkgrid(tklabel(frame.rigth, text=""), sticky='w')
+    tkgrid(tklabel(frame.rigth, text="    Number of age-groups norms"),
+           entry.n.age.groups, sticky='w')
     tkgrid(tklabel(frame.rigth, text="    Transformation is equal for both sexes?"),
            tklabel(frame.rigth, text='Yes'), rb.equal.yes,
            tklabel(frame.rigth, text='No'), rb.equal.no, sticky='w')
-    tkgrid(tklabel(frame.rigth, text="    Add a graph for T'scores?"),
+    tkgrid(tklabel(frame.rigth, text="    Add a pseudo-graph for T'scores?"),
            tklabel(frame.rigth, text='Yes'), rb.graph.yes,
            tklabel(frame.rigth, text='No'), rb.graph.no, sticky='w')
     
@@ -1299,7 +1351,8 @@ add.new.test <- function() {
                                    trans <- tclvalue(test.char[['transVal']]),
                                    equal <- tclvalue(test.char[['equalVal']]),
                                    graph <- tclvalue(test.char[['graphVal']]),
-                                   name.trans <- tclvalue(test.char[['name.transVal']]))
+                                   name.trans <- tclvalue(test.char[['name.transVal']]),
+                                   n.age.agroups <- tclvalue(test.char[['n.age.groupsVal']]))
     } else {
       OkTest <- 'no' # windows has been calcelled
       test.characteristics <- as.list(rep('', 15))
@@ -1378,7 +1431,7 @@ add.new.test <- function() {
                 sep=''),
           file='tmp', append=TRUE)
     }
-    cat('\n  blanks <- sum(is.na(answers)) # compute number of missings', file='tmp', append=TRUE)
+    cat('\n  blanks <- sum(is.na(answers)) # compute number of missing items', file='tmp', append=TRUE)
     cat(paste('\n  pcnt.blanks <- round((blanks / ',
               n.items,
               ') * 100) # compute % of missings',
@@ -1423,7 +1476,7 @@ add.new.test <- function() {
       cat('\n      position <- round((T.score / 2) + 1)' , file='tmp', append=TRUE)
       cat(paste('\n      graph <- paste(substr(template, 1, position-1),',
                 '                     substr(template, position + 1, nchar(template)),',
-                '                     sep="o")',
+                '                     sep="o")  # "o" marks the position',
                 sep='\n'),
           file='tmp', append=TRUE)
       cat('\n    } else {' , file='tmp', append=TRUE)
@@ -2123,7 +2176,7 @@ add.new.test <- function() {
       cat('\n  results.scores <- unlist(results[-c(1, 2)])  # not Acronym & Scale columns',
           file='tmp', append=TRUE)
     } else {
-      cat('\n  results.scores <- unlist(results[-c(1, 2, 6)])  # not Acronym & Scale columns',
+      cat('\n  results.scores <- unlist(results[-c(1, 2, 6)])  # not Acronym, Scale & Graph columns',
           file='tmp', append=TRUE)
     }
     cat('\n  names <- paste(results$Acronym, names(results.scores), sep=".")',
@@ -2140,7 +2193,7 @@ add.new.test <- function() {
     
     cat('\n\n  # Output in form of list', file='tmp', append=TRUE)
     cat('\n  # ------------------', file='tmp', append=TRUE)
-    cat('\n  results.lst <- list(paste("Total number of missings: ",',
+    cat('\n  results.lst <- list(paste("Total number of missing items: ",',
         file='tmp', append=TRUE)
     cat('\n                            blanks,',
         file='tmp', append=TRUE)
