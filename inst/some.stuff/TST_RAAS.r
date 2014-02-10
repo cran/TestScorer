@@ -1,5 +1,5 @@
 # RAAS scale scoring script
-# Creation date: 2013-10-09
+# Creation date: 2014-01-07
 # --------------
 
 testChar <- list(acronym = "RAAS",
@@ -15,12 +15,12 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   # "sex", "age", "id", "date.test" & "comm" used if appropiate.
   answers <- as.numeric(answers) # transform to numeric for easier scoring
   answers[answers %in% c(0)] <- NA # missing characters to NA
-  blanks <- sum(is.na(answers)) # compute number of missings
-  pcnt.blanks <- round((blanks / 18) * 100) # compute % of missings
+  blanks <- sum(is.na(answers)) # compute number of missing items
+  pcnt.blanks <- round((blanks / 18) * 100) # compute % of missing items
   # Items which should be reversed
   reversed.items=c(2, 7, 8, 13, 16, 17, 18)
   answers[reversed.items] <- (5 + 1) - answers[reversed.items]
-  results <- data.frame(NULL) # Null data frame for results
+  results <- data.frame(NULL) # Initialize null data frame for results
 
   toT <- function(raw.score, mean, sd) {  # compute T score
     T.score <- round(((raw.score - mean) / sd) * 10 + 50)
@@ -38,7 +38,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
       position <- round((T.score / 2) + 1)
       graph <- paste(substr(template, 1, position-1),
                      substr(template, position + 1, nchar(template)),
-                     sep="o")
+                     sep="o")  # "o" marks the position
     } else {
       graph <- "Not graphicable"
     }
@@ -51,8 +51,8 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   results[1, "Scale"] <- "Close" # name of the scale
   # Items making up the scale
   items <- c(1, 6, 8, 12, 13, 17)
-  results[1, "Miss"] <- sum(is.na(answers[items])) # number of missings
-  if (results[1, "Miss"] == length(items)) {  # all answers are missings
+  results[1, "Miss"] <- sum(is.na(answers[items])) # number of missing items
+  if (results[1, "Miss"] == length(items)) {  # all answers are missing items
     results[1, "Raw"] <- NA
     results[1, "T"] <- NA
     results[1, "Graph"] <- "All missings"
@@ -69,8 +69,8 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   results[2, "Scale"] <- "Dependent" # name of the scale
   # Items making up the scale
   items <- c(2, 5, 7, 14, 16, 18)
-  results[2, "Miss"] <- sum(is.na(answers[items])) # number of missings
-  if (results[2, "Miss"] == length(items)) {  # all answers are missings
+  results[2, "Miss"] <- sum(is.na(answers[items])) # number of missing items
+  if (results[2, "Miss"] == length(items)) {  # all answers are missing items
     results[2, "Raw"] <- NA
     results[2, "T"] <- NA
     results[2, "Graph"] <- "All missings"
@@ -87,8 +87,8 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   results[3, "Scale"] <- "Anxiety" # name of the scale
   # Items making up the scale
   items <- c(3, 4, 9, 10, 11, 15)
-  results[3, "Miss"] <- sum(is.na(answers[items])) # number of missings
-  if (results[3, "Miss"] == length(items)) {  # all answers are missings
+  results[3, "Miss"] <- sum(is.na(answers[items])) # number of missing items
+  if (results[3, "Miss"] == length(items)) {  # all answers are missing items
     results[3, "Raw"] <- NA
     results[3, "T"] <- NA
     results[3, "Graph"] <- "All missings"
@@ -101,7 +101,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
 
   # Vector for writing scores to a file
   # --------------------
-  results.scores <- unlist(results[-c(1, 2)])  # not Acronym & Scale columns
+  results.scores <- unlist(results[-c(1, 2, 6)])  # not Acronym, Scale & Graph columns
   names <- paste(results$Acronym, names(results.scores), sep=".")
   names(results.scores) <- sub("[0-9]+$", "", names)  # delete ending numbers
 
@@ -116,29 +116,29 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   results[5, ] <- c("CD", "Close/Dependent", "", CD, "", "") # no data for T score
   
   # Attachment style assignement
-  if (is.na(CD)) style <- 'Not evaluable' # if all answers are missings
-  else if (CD > 3 & results[3, 'Raw'] < 3) style <- 'Secure'
-  else if (CD > 3 & results[3, 'Raw'] > 3) style <- 'Preoccupied'
-  else if (CD < 3 & results[3, 'Raw'] < 3) style <- 'Dismissing'
-  else if (CD < 3 & results[3, 'Raw'] > 3) style <- 'Fearful'
-  else style <- 'Not classificable'
+  if (is.na(CD)) style <- "Not evaluable" # if all answers are missings
+  else if (CD > 3 & results[3, "Raw"] < 3) style <- "Secure"
+  else if (CD > 3 & results[3, "Raw"] > 3) style <- "Preoccupied"
+  else if (CD < 3 & results[3, "Raw"] < 3) style <- "Dismissing"
+  else if (CD < 3 & results[3, "Raw"] > 3) style <- "Fearful"
+  else style <- "Not classificable"
 
   # Show style as a plot
   windows(title="Attachment style")
-  plot(CD, results[3, 'Raw'], xlim=c(1,5), ylim=c(1,5), pch=3, cex=2, col='blue', lwd=5,
-       xlab='Close/Dependent', ylab='Anxiety', main=paste(id, date.test),
-       font.sub=2, sub='The position of the subject is represented by a blue cross')
+  plot(CD, results[3, "Raw"], xlim=c(1,5), ylim=c(1,5), pch=3, cex=2, col="blue", lwd=5,
+       xlab="Close/Dependent", ylab="Anxiety", main=paste(id, date.test),
+       font.sub=2, sub="The position of the subject is represented by a blue cross")
   abline(v=3)
   abline(h=3)
-  text(2, 2, labels='Dismissing', col='gray60', font=2, cex=2)
-  text(4, 2, labels='Secure', col='gray60', font=2, cex=2)
-  text(2, 4, labels='Fearful', col='gray60', font=2, cex=2)
-  text(4, 4, labels='Preocupied', col='gray60', font=2, cex=2)
+  text(2, 2, labels="Dismissing", col="gray60", font=2, cex=2)
+  text(4, 2, labels="Secure", col="gray60", font=2, cex=2)
+  text(2, 4, labels="Fearful", col="gray60", font=2, cex=2)
+  text(4, 4, labels="Preocupied", col="gray60", font=2, cex=2)
   # ===== END ADDITIONAL CODE INSERTED MANUALLY
   
   # Output in form of list
   # ------------------
-  results.lst <- list(paste("Total number of missings: ",
+  results.lst <- list(paste("Total number of missing items: ",
                             blanks,
                             " (",
                             pcnt.blanks,
@@ -146,8 +146,8 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
                             sep=""),
                             # ===== ADDITIONAL CODE INSERTED MANUALLY
                             "",
-                            "According to the author, attach styles assignement 'is quite exploratory...",
-                            "[use] with caution, and only in conjunction with the continuous measures.'",
+                            'According to the author, attach styles assignement "is quite exploratory...',
+                            '[use] with caution, and only in conjunction with the continuous measures."',
                             "",
                             paste("Attach style:", style),
                             "",

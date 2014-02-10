@@ -1,19 +1,25 @@
+1.5 (2014-02-04)
+  * The "Only write" button is disabled when results should not be saved.
+  * Now the items window is correctly reseted for tests with more than 100 items.
+  * When pseudo-graphical representation is required, it is not saved to the external file.
+  * Not yet implemented: Norms for different age groups.
+
 1.4 (2013-11-29)
-  * A new option has been added to only write to disk (without showing) the results
-  * Code improvements to make buttons actions clearer
-  * Typos fixed in examples
-  * Documentation updated
+  * A new option has been added to only write to disk (without showing) the results.
+  * Code improvements to make the actions of the buttons clearer.
+  * Typos fixed in examples.
+  * Documentation updated.
 
 1.3 (2013-09-25)
-  * Bug fixed in saving items
-  * Some code optimization
+  * Bug fixed in saving items.
+  * Some code optimization.
 
 1.2 (2013-6-25)
-  * Tktable used for transforming raw scores
-  * Now package works even if not installed under R home directory, code suggested by K. Antal
-  * A few more warning and error messages were added
+  * Tktable used for transforming raw scores.
+  * Now package works even if not installed under R home directory, code suggested by K. Antal.
+  * A few more warning and error messages were added.
 
 1.1 (2013-04-20)
-  * Minor bugs fixed
-  * Code improvements for compatibility
-  * Fixed some typo errors
+  * Minor bugs fixed.
+  * Code improvements for compatibility.
+  * Fixed some typo errors.

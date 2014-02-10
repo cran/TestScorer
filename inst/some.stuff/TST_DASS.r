@@ -15,9 +15,9 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   # "sex", "age", "id", "date.test" & "comm" used if appropiate.
   answers <- as.numeric(answers) # transform to numeric for easier scoring
   answers[answers %in% c(4)] <- NA # missing characters to NA
-  blanks <- sum(is.na(answers)) # compute number of missings
+  blanks <- sum(is.na(answers)) # compute number of missing items
   pcnt.blanks <- round((blanks / 42) * 100) # compute % of missings
-  results <- data.frame(NULL) # Null data frame for results
+  results <- data.frame(NULL) # Initialize null data frame for results
 
   # D scale scoring commands
   # --------------
@@ -25,7 +25,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   results[1, "Scale"] <- "Depression" # name of the scale
   # Items making up the scale
   items <- c(3, 5, 10, 13, 16, 17, 21, 24, 26, 31, 34, 37, 38, 42)
-  results[1, "Miss"] <- sum(is.na(answers[items])) # number of missings
+  results[1, "Miss"] <- sum(is.na(answers[items])) # number of missing items
   if (results[1, "Miss"] == length(items)) {  # all answers are missings
     results[1, "Raw"] <- NA
     results[1, "Centil"] <- NA
@@ -44,7 +44,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   results[2, "Scale"] <- "Anxiety" # name of the scale
   # Items making up the scale
   items <- c(2, 4, 7, 9, 15, 19, 20, 23, 25, 28, 30, 36, 40, 41)
-  results[2, "Miss"] <- sum(is.na(answers[items])) # number of missings
+  results[2, "Miss"] <- sum(is.na(answers[items])) # number of missing items
   if (results[2, "Miss"] == length(items)) {  # all answers are missings
     results[2, "Raw"] <- NA
     results[2, "Centil"] <- NA
@@ -63,7 +63,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   results[3, "Scale"] <- "Stress" # name of the scale
   # Items making up the scale
   items <- c(1, 6, 8, 11, 12, 14, 18, 22, 27, 29, 32, 33, 35, 39)
-  results[3, "Miss"] <- sum(is.na(answers[items])) # number of missings
+  results[3, "Miss"] <- sum(is.na(answers[items])) # number of missing items
   if (results[3, "Miss"] == length(items)) {  # all answers are missings
     results[3, "Raw"] <- NA
     results[3, "Centil"] <- NA
@@ -84,7 +84,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
 
   # Output in form of list
   # ------------------
-  results.lst <- list(paste("Total number of missings: ",
+  results.lst <- list(paste("Total number of missing items: ",
                             blanks,
                             " (",
                             pcnt.blanks,
