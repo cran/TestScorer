@@ -1,8 +1,11 @@
+1.6 (2014-07-04)
+  * Some code improvements
+  * Documentation improved
+
 1.5 (2014-02-04)
   * The "Only write" button is disabled when results should not be saved.
   * Now the items window is correctly reseted for tests with more than 100 items.
   * When pseudo-graphical representation is required, it is not saved to the external file.
-  * Not yet implemented: Norms for different age groups.
 
 1.4 (2013-11-29)
   * A new option has been added to only write to disk (without showing) the results.

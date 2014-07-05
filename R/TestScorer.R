@@ -1,6 +1,6 @@
 # ==================================================================================
-# TestScorer 1.5
-# Last modification: 2014.02.04
+# TestScorer 1.6
+# Last modification: 2014.07.04
 # ==================================================================================
 
 # ==================================================================================
@@ -65,12 +65,12 @@ TestScorerGUI <- function() {
   arial8 <- tkfont.create(family="arial", size=8)   # font to show test info
   
   # environments for exchanging variable values easier
-  present.test <- new.env() # environment for: test
+  present.test <- new.env(parent = emptyenv()) # environment for: test
   #                                            total.items
   #                                            valid.characters
   #                                            item.string
   #                                            next.item
-  subject <- new.env() # environment for: id
+  subject <- new.env(parent = emptyenv()) # environment for: id
   #                                       age
   #                                       sex
   #                                       date.test
@@ -551,7 +551,8 @@ TestScorerGUI <- function() {
       answers[i] <- substring(present.test[['items.string']], i, i)
     # now read test script and calls score function
     eval(parse(text=paste(text="source('",
-                          present.test[['test']],".r')",
+                          present.test[['test']],
+                          ".r')",
                           sep=""))) # reads file with scoring code
     results <- scoring.fun(answers,
                            subject[['sex']],
@@ -580,7 +581,7 @@ TestScorerGUI <- function() {
     cat('Age:', subject[['age']], '\n')
     cat('Date:', subject[['date.test']], '\n')
     cat('Comment:', subject[['comm.sbj']], '\n\n')
-    for (i in 1:length(results.lst))
+    for (i in seq_along(results.lst))
       cat(results.lst[[i]], '\n')
     cat('\n')
     print(results.df, right=FALSE, row.names=FALSE, na.print='-')
@@ -679,7 +680,14 @@ TestScorerGUI <- function() {
   }  # end on.clean.test
         
   on.exit <- function() {
-    cat('\nTo terminate the R session close the window or type: q()')
+    msg <- paste('   -------------------------------------------------------',
+                 '   | To exit the R session close the window or type: q() |',
+                 '   |                                                     |',                 
+                 '   | TestScorer don not use the workspace image, so      |',
+                 '   | you can safely answer "No" to the next question.    |',
+                 '   -------------------------------------------------------',
+                 sep='\n')
+    message(msg)
     tkdestroy(top)
   }  # end on.exit
         
@@ -844,7 +852,7 @@ set.tests.directory <- function() {
     tkgrab.release(choice.dir.top)
     tkdestroy(choice.dir.top)
     
-    if (doneChoiceDir=='1' & choiceDir=='continue') {
+    if (doneChoiceDir=='1' && choiceDir=='continue') {
       set.dir <- 'stop TestScorer'
       working.dir <- tk_choose.dir()
       if (working.dir!='')  { # a dir has been choosen or created
@@ -859,7 +867,7 @@ set.tests.directory <- function() {
                                      package='TestScorer'), to=working.dir)
           file.copy(from=system.file('some.stuff/Help.txt',
                                      package='TestScorer'), to=working.dir)
-          file.copy(from=system.file('doc/TestScorerHelp.pdf',
+          file.copy(from=system.file('some.stuff/TestScorerHelp.pdf',
                                      package='TestScorer'), to=working.dir)
           # write .Rprofile
           cat(paste('# Profile to launch TestScorer',
@@ -890,7 +898,7 @@ set.tests.directory <- function() {
     existing.tests <- content[grep('^TST_.+\\.r$', content)]
     if (length(existing.tests)>0) {
       catalog <- list()
-      for (i in 1:length(existing.tests)) {
+      for (i in seq_along(existing.tests)) {
         source(existing.tests[i]) # reads files to extract tests characteristics
         catalog <- c(catalog, list(testChar))  # read testChar load by source
         # checks for duplicated tests acronyms
@@ -920,7 +928,7 @@ add.new.test <- function() {
   # returns: ret.values=list(continue.test, list(test.characteristics))
   # =======================================================
   
-  test.char <- new.env()  # environment for: acronymTestVal
+  test.char <- new.env(parent = emptyenv())  # environment for: acronymTestVal
   #                                          nameTestVal
   #                                          refVal
   #                                          commVal
@@ -938,7 +946,7 @@ add.new.test <- function() {
   #                                          name.transVal
   #                                          trans.is.numeric
   assign('trans.is.numeric', 'yes', envir=test.char)  # initialize
-  scale.char <- new.env()  # environment for: transTable
+  scale.char <- new.env(parent = emptyenv())  # environment for: transTable
   assign('trans.is.numeric', 'yes', envir=scale.char)  # initialize
   
   make.test.window <- function() {
@@ -956,7 +964,7 @@ add.new.test <- function() {
     } # end no.trans
     
     other.trans <- function() {
-      if (tclvalue(test.char[['prorrateVal']])=='yes' | tclvalue(test.char[['scoringVal']])=='mean')
+      if (tclvalue(test.char[['prorrateVal']])=='yes' || tclvalue(test.char[['scoringVal']])=='mean')
         tkmessageBox(message='NB: Raw scores would be rounded before transformation.\n        Considerer if rounding is appropiate.',
                      icon='warning', type='ok')
       if (tclvalue(test.char[['graphVal']])=='yes')
@@ -986,7 +994,7 @@ add.new.test <- function() {
     }  # end Tmean.trans
     
     Ttable.trans <- function() {
-      if (tclvalue(test.char[['prorrateVal']])=='yes' | tclvalue(test.char[['scoringVal']])=='mean')
+      if (tclvalue(test.char[['prorrateVal']])=='yes' || tclvalue(test.char[['scoringVal']])=='mean')
         tkmessageBox(message=paste('NB: Raw scores would be rounded before transformation.',
                                    '        Considerer if rounding is appropiate.',
                                    sep='\n'),
@@ -1076,7 +1084,7 @@ add.new.test <- function() {
       
       # number of items
       n.items <- as.numeric(tclvalue(test.char[['n.itemsVal']]))
-      if (is.na(n.items) | length(grep('\\.', n.items)>0)) {  # detects missing or decimal
+      if (is.na(n.items) || length(grep('\\.', n.items)>0)) {  # detects missing or decimal
         is.OkTest <- 'no'
         tkmessageBox(message="Number of items is not valid.", icon="error", type="ok")
       }
@@ -1084,8 +1092,8 @@ add.new.test <- function() {
       # valid answers
       valid <- tclvalue(test.char[['validVal']])
       valid <- as.numeric(unlist(strsplit(valid, ','))) # string to a numerical vector
-      if (length(valid) == 0 |        # detect missing
-            any(is.na(valid)) |         # id erroneus character (not a number)
+      if (length(valid) == 0 ||        # detect missing
+            any(is.na(valid)) ||         # id erroneus character (not a number)
             any(nchar(valid) > 1))  {    # id more than one character
         is.OkTest <- 'no'
         tkmessageBox(message="Valid answers are not valid.", icon="error", type="ok")
@@ -1094,7 +1102,7 @@ add.new.test <- function() {
       # missings
       miss <- tclvalue(test.char[['missVal']])
       miss <- as.numeric(unlist(strsplit(miss, ','))) # string to a numerical vector
-      if (any(is.na(miss)) |         # detect erroneus character (not a number)
+      if (any(is.na(miss)) ||         # detect erroneus character (not a number)
             any(nchar(valid) > 1)) {    # id more than one character
         is.OkTest <- 'no'
         tkmessageBox(message="Missings are not valid.", icon="error", type="ok")
@@ -1112,7 +1120,7 @@ add.new.test <- function() {
         tkmessageBox(message="Reversed items are not valid.", icon="error", type="ok")
       }
       # not greater than number of items
-      if (length(reversed)!=0 & max(reversed, na.rm=TRUE)>n.items) {
+      if (length(reversed)!=0 && max(reversed, na.rm=TRUE)>n.items) {
         is.OkTest <- 'no'
         tkmessageBox(message="Some reversed item is greather than de number of items of the test.",
                      icon="error", type="ok")
@@ -1127,7 +1135,7 @@ add.new.test <- function() {
    
       # number of age groups
       n.age.groups <- as.numeric(tclvalue(test.char[['n.age.groupsVal']]))
-      if (is.na(n.age.groups) | grepl('\\.', n.age.groups)) {  # should be an integer
+      if (is.na(n.age.groups) || grepl('\\.', n.age.groups)) {  # should be an integer
         is.OkTest <- 'no'
         tkmessageBox(message="Age-groups is not an integer.", icon="error", type="ok")
       }
@@ -1509,8 +1517,8 @@ add.new.test <- function() {
       # items
       tmp <- tclvalue(itemsVal)
       items <- as.numeric(unlist(strsplit(tmp, ','))) # string to a numerical vector
-      if (length(items) == 0 |              # detect missing
-            any(is.na(items)) |               # id erroneous character
+      if (length(items) == 0 ||              # detect missing
+            any(is.na(items)) ||               # id erroneous character
             any(grep('\\.', items))) {         # detect decimal point
         is.OkScale <- 'no'
         tkconfigure(entry.items, state='normal')
@@ -1524,7 +1532,7 @@ add.new.test <- function() {
       }
       
       # no transform table
-      if (trans=='no' | trans=='Tmean')
+      if (trans=='no' || trans=='Tmean')
         assign('tableDone', 'no table is needed', envir=scale.char)
       
       # transform Tmean
@@ -1580,7 +1588,7 @@ add.new.test <- function() {
         tkmessageBox(message="You need open and fill the transformation table.",
                      icon="error", type="ok")
       } else
-        if (any(grepl('^-$', unlist(scale.char[['transTable']]))) |
+        if (any(grepl('^-$', unlist(scale.char[['transTable']]))) ||
               any(grepl('^$', unlist(scale.char[['transTable']])))) {
           is.OkScale <- 'no'
           msg <- paste('All or some of the transformations values are missing',
@@ -1657,7 +1665,7 @@ add.new.test <- function() {
                sticky='w')
         
       }
-    } else if (trans=='Ttable' | trans=='Other') {
+    } else if (trans=='Ttable' || trans=='Other') {
       #---  transformation table
       make.table.win <- function(valid, items, equal) {
         tkconfigure(entry.items, state='disabled') # disable editing items
@@ -1816,17 +1824,17 @@ add.new.test <- function() {
       trans.1 <- NA
       trans.males <- NA
       trans.females <- NA
-      if(trans=='Tmean' & equal=='yes') {
+      if(trans=='Tmean' && equal=='yes') {
         mean.1 <- as.numeric(tclvalue(mean.1Val))
         sd.1 <- as.numeric(tclvalue(sd.1Val))
       }
-      else if (trans=='Tmean' & equal=='no') {
+      else if (trans=='Tmean' && equal=='no') {
         mean.males <- as.numeric(tclvalue(mean.malesVal))
         sd.males <- as.numeric(tclvalue(sd.malesVal))
         mean.females <- as.numeric(tclvalue(mean.femalesVal))
         sd.females <- as.numeric(tclvalue(sd.femalesVal))
       }
-      else if ((trans=='Ttable' | trans=='Other') & equal=='yes') {
+      else if ((trans=='Ttable' || trans=='Other') && equal=='yes') {
         trans.1 <- scale.char[['transTable']]
         trans.1 <- trans.1[[1]]
         trans.1 <- gsub('(^-)|(-$)', '', trans.1)
@@ -1836,13 +1844,13 @@ add.new.test <- function() {
         } else 
           assign('trans.is.numeric', 'yes', envir=scale.char)
       }
-      else if ((trans=='Ttable' | trans=='Other') & equal=='no') {
+      else if ((trans=='Ttable' || trans=='Other') && equal=='no') {
         trans <- scale.char[['transTable']]
         trans.males <- trans[[1]]
         trans.females <- trans[[2]]
         trans.males <- gsub('(^-)|(-$)', '', trans.males)  # del -
         trans.females <- gsub('(^-)|(-$)', '', trans.females)
-        if (sum(!grepl('^[0-9]+$', trans.males))>0 | sum(!grepl('^[0-9]+$', trans.females))>0) {
+        if (sum(!grepl('^[0-9]+$', trans.males))>0 || sum(!grepl('^[0-9]+$', trans.females))>0) {
           assign('trans.is.numeric', 'no', envir=test.char)
           assign('trans.is.numeric', 'no', envir=scale.char)
         } else
@@ -1935,7 +1943,7 @@ add.new.test <- function() {
               sep=''),
         file='tmp', append=TRUE)
     
-    if (trans=='Tmean' | trans=='Ttable') {
+    if (trans=='Tmean' || trans=='Ttable') {
       cat(paste('\n    results[',
                 scale.num,
                 ', "T"] <- NA',
@@ -1964,13 +1972,13 @@ add.new.test <- function() {
         file='tmp', append=TRUE)
     
     # three scoring option: sum no prorrate, sum & prorrate, mean
-    if (scoring=='sum' & prorrate=='no')
+    if (scoring=='sum' && prorrate=='no')
       cat(paste('\n    results[', 
                 scale.num,
                 ', "Raw"] <- sum(answers[items], na.rm=TRUE) # sum answered items',
                 sep=''),
           file='tmp', append=TRUE)
-    else if (scoring=='sum' & prorrate=='yes')
+    else if (scoring=='sum' && prorrate=='yes')
       cat(paste('\n    results[',
                 scale.num,
                 ', "Raw"] <- round(mean(answers[items], na.rm=TRUE)*length(items), 2) # sum pondering missings',
@@ -2021,7 +2029,7 @@ add.new.test <- function() {
                 sep=''),
           file='tmp', append=TRUE)
       
-    } else if ((trans=='Ttable' | trans=='Other') & equal=='no') {
+    } else if ((trans=='Ttable' || trans=='Other') && equal=='no') {
       # build vector trans.males.tabel
       cat('\n    # Vector for score transformation', file='tmp', append=TRUE)
       if (scale.char[['trans.is.numeric']]=='yes') {
@@ -2063,7 +2071,7 @@ add.new.test <- function() {
       }
       
       # build index
-      if (scoring=='sum' & prorrate=='no')
+      if (scoring=='sum' && prorrate=='no')
         cat(paste('\n    index <- results[',
                   scale.num,
                   ', "Raw"]',
@@ -2106,7 +2114,7 @@ add.new.test <- function() {
         cat(name.trans , file='tmp', append=TRUE)
       cat('"] <- trans.females.table[index]', file='tmp', append=TRUE)
       
-    } else if ((trans=='Ttable' | trans=='Other') & equal=='yes') {
+    } else if ((trans=='Ttable' || trans=='Other') && equal=='yes') {
       # build vector trans.table
       cat('\n  # Vector for score transformation', file='tmp', append=TRUE)
       if (scale.char[['trans.is.numeric']]=='yes') {
@@ -2121,7 +2129,7 @@ add.new.test <- function() {
         cat(paste('"', trans.1[length(trans.1)], '")', sep=''), file='tmp', append=TRUE)
       }
       # build index
-      if (scoring=='sum' & prorrate=='no')
+      if (scoring=='sum' && prorrate=='no')
         cat(paste('\n    index <- results[',
                   scale.num,
                   ', "Raw"]',
@@ -2248,7 +2256,7 @@ add.new.test <- function() {
   
   if (continue.test=='yes') {
     scale.num <-0
-    while (scale.num < n.scales & continue.test == 'yes') {
+    while ((scale.num < n.scales) && (continue.test == 'yes')) {
       scale.num <- scale.num + 1
       ret.values <- make.scale.window(scale.num, n.items, valid, trans,
                                       equal, graph, name.trans)
@@ -2319,7 +2327,7 @@ delete.test <- function() {
   test.selBox <- tklistbox(delete.top, height=3, width='31',
                            selectmode='single', yscrollcommand=function(...)tkset(scr,...),
                            background='white', exportselection=F)
-  for (i in (1:length(existing.tests)))
+  for (i in (seq_along(existing.tests)))
     tkinsert(test.selBox,'end', existing.tests[i])  # test acronyms
   tkselection.set(test.selBox,0)  # Default test (rem: indexing starts at zero)
   tkgrid(tklabel(delete.top, text='Which test would you like to delete?'), sticky='nw')
