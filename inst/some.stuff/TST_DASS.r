@@ -99,8 +99,8 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
 
   # Return results
   # ------------------
-  return(list(results.lst = results.lst,
-              results.df = results,
-              results.scores = results.scores))
+  list(results.lst = results.lst,
+       results.df = results,
+       results.scores = results.scores)
 
 } # end of scoring.fun

@@ -1,6 +1,6 @@
 # ==================================================================================
-# TestScorer 1.6
-# Last modification: 2014.07.04
+# TestScorer 1.7
+# Last modification: 2015.04.19
 # ==================================================================================
 
 # ==================================================================================
@@ -79,7 +79,7 @@ TestScorerGUI <- function() {
   # top window with three columns: test, id, items
   # -----------------------------------------------
   top <- tktoplevel()
-  tkwm.title(top, 'TestScorer 1.5')
+  tkwm.title(top, 'TestScorer 1.6')
   tkwm.resizable(top, FALSE, FALSE)
   
   testFrame <- tkframe(top, relief="groove",borderwidth=2)  # col 1 for test
@@ -563,10 +563,10 @@ TestScorerGUI <- function() {
     results.lst <- results$results.lst
     results.df <- results$results.df
     results.scores <- results$results.scores
-    return(list(results.lst=results.lst,
-                results.df=results.df, 
-                results.scores=results.scores,
-                answers=answers))
+    list(results.lst=results.lst,
+         results.df=results.df, 
+         results.scores=results.scores,
+         answers=answers)
   }  # end score.results 
     
   show.results <- function(results.lst, results.df){
@@ -629,11 +629,11 @@ TestScorerGUI <- function() {
                            row.names=F, col.names=F, sep=';', na='', quote=TRUE)
       }
       rm(case, inherits=TRUE)   # to avoid dragging
-      msg <- 'Test scores has been recorded.'
+      msg <- 'Test scores has been saved.'
       tkmessageBox(message=msg, icon='info')
     }  # end if... write to file
     else {msg <- paste('First choose a file where to write the resuts.',
-                       'Use the "Cange option" button.',
+                       'Use the "Change option" button.',
                        sep='\n')
           tkmessageBox(message=msg, icon='error')}
   }  # end write.results
@@ -765,7 +765,7 @@ TestScorerGUI <- function() {
   # frame for buttons
   buttFrame <- tkframe(top)
   showBut <- tkbutton(buttFrame, text="      Show results      ", command=on.show.and.record)
-  writeBut <- tkbutton(buttFrame, text="    Only write    ",
+  writeBut <- tkbutton(buttFrame, text="    Only save    ",
                         foreground='gray50', command=on.write)
   cleanTestBut <- tkbutton(buttFrame, text=" Clean items ", command=on.clean.test)
   cleanAllBut <- tkbutton(buttFrame, text="  Clean all   ", command=on.clean.all)
@@ -867,7 +867,7 @@ set.tests.directory <- function() {
                                      package='TestScorer'), to=working.dir)
           file.copy(from=system.file('some.stuff/Help.txt',
                                      package='TestScorer'), to=working.dir)
-          file.copy(from=system.file('some.stuff/TestScorerHelp.pdf',
+          file.copy(from=system.file('doc/TestScorerHelp.pdf',
                                      package='TestScorer'), to=working.dir)
           # write .Rprofile
           cat(paste('# Profile to launch TestScorer',
@@ -917,7 +917,7 @@ set.tests.directory <- function() {
     stop(paste('No directory has been choosen.',
                'TestScorer has been stopped by the user.',
                sep='\n'))
-  return(catalog)
+  catalog
 } # end set.tests.directory
       
       
@@ -1153,7 +1153,7 @@ add.new.test <- function() {
       }
       
       options(warn=0)
-      return(is.OkTest)
+      is.OkTest
     } # end validate.test
     
     OnOkTest <- function() {
@@ -1367,7 +1367,7 @@ add.new.test <- function() {
     }
     
     tkdestroy(top.test)
-    return(list(OkTest=OkTest, test.characteristics=test.characteristics))
+    list(OkTest=OkTest, test.characteristics=test.characteristics)
   } # end make.test.window
   
   write.test.begining <- function(acronymTest, nameTest, ref, n.items, valid,
@@ -1468,7 +1468,7 @@ add.new.test <- function() {
     if (trans=='Tmean') {
       cat('\n\n  toT <- function(raw.score, mean, sd) {  # compute T score' , file='tmp', append=TRUE)
       cat('\n    T.score <- round(((raw.score - mean) / sd) * 10 + 50)' , file='tmp', append=TRUE)
-      cat('\n    return(T.score)' , file='tmp', append=TRUE)
+      cat('\n    T.score' , file='tmp', append=TRUE)
       cat('\n  } # end toT' , file='tmp', append=TRUE)
     }
     if (graph=='yes') {
@@ -1491,7 +1491,7 @@ add.new.test <- function() {
       cat('\n      graph <- "Not graphicable"',
           file='tmp', append=TRUE)
       cat('\n    }', file='tmp', append=TRUE)
-      cat('\n    return(graph)', file='tmp', append=TRUE)
+      cat('\n    graph', file='tmp', append=TRUE)
       cat('\n  } # end makeGraph' , file='tmp', append=TRUE)
     }
   } # end write.test.begining
@@ -1598,7 +1598,7 @@ add.new.test <- function() {
         }
       
       options(warn=0)
-      return(is.OkScale)
+      is.OkScale
     }  # end ValidateScaleChar
     
     # ---- window for scale
@@ -1885,7 +1885,7 @@ add.new.test <- function() {
       }
     
     tkdestroy(top.scale)
-    return(list(OkScale=OkScale, scale.characteristics=scale.characteristics))
+    list(OkScale=OkScale, scale.characteristics=scale.characteristics)
   } # end make.scale.window
   
   write.scale <- function(acronymScale, nameScale, items,
@@ -2216,9 +2216,9 @@ add.new.test <- function() {
     
     cat('\n\n  # Return results', file='tmp', append=TRUE)
     cat('\n  # ------------------', file='tmp', append=TRUE)
-    cat('\n  return(list(results.lst = results.lst,', file='tmp', append=TRUE)
-    cat('\n              results.df = results,', file='tmp', append=TRUE)
-    cat('\n              results.scores = results.scores))', file='tmp', append=TRUE)
+    cat('\n  list(results.lst = results.lst,', file='tmp', append=TRUE)
+    cat('\n       results.df = results,', file='tmp', append=TRUE)
+    cat('\n       results.scores = results.scores)', file='tmp', append=TRUE)
     
     cat('\n\n} # end of scoring.fun', file='tmp', append=TRUE)
     

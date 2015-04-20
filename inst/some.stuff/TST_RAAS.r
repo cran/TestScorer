@@ -24,7 +24,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
 
   toT <- function(raw.score, mean, sd) {  # compute T score
     T.score <- round(((raw.score - mean) / sd) * 10 + 50)
-    return(T.score)
+    T.score
   } # end toT
 
   makeGraph <- function(T.score) {  # make a graph
@@ -42,7 +42,7 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
     } else {
       graph <- "Not graphicable"
     }
-    return(graph)
+    graph
   } # end makeGraph
 
   # C scale scoring commands
@@ -144,22 +144,22 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
                             pcnt.blanks,
                             "%)",
                             sep=""),
-                            # ===== ADDITIONAL CODE INSERTED MANUALLY
-                            "",
-                            'According to the author, attach styles assignement "is quite exploratory...',
-                            '[use] with caution, and only in conjunction with the continuous measures."',
-                            "",
-                            paste("Attach style:", style),
-                            "",
-                            "T-scores computed using mean and standard deviation from 414 USA college students,",
-                            "reported by Ledley et al. J Psychopath Behav Assess 2006, 28:33-40."
-                            # ===== END ADDITIONAL CODE INSERTED MANUALLY
-                      )                            
+                      # ===== ADDITIONAL CODE INSERTED MANUALLY
+                      "",
+                      'According to the author, attach styles assignement "is quite exploratory...',
+                      '[use] with caution, and only in conjunction with the continuous measures."',
+                      "",
+                      paste("Attach style:", style),
+                      "",
+                      "T-scores computed using mean and standard deviation from 414 USA college students,",
+                      "reported by Ledley et al. J Psychopath Behav Assess 2006, 28:33-40."
+                      # ===== END ADDITIONAL CODE INSERTED MANUALLY
+                     )                            
 
   # Return results
   # ------------------
-  return(list(results.lst = results.lst,
-              results.df = results,
-              results.scores = results.scores))
+  list(results.lst = results.lst,
+       results.df = results,
+       results.scores = results.scores)
 
 } # end of scoring.fun
