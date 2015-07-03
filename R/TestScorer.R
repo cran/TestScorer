@@ -1,6 +1,6 @@
 # ==================================================================================
-# TestScorer 1.7
-# Last modification: 2015.04.19
+# TestScorer 1.7.1
+# Last modification: 2015.07.02
 # ==================================================================================
 
 # ==================================================================================
@@ -79,7 +79,7 @@ TestScorerGUI <- function() {
   # top window with three columns: test, id, items
   # -----------------------------------------------
   top <- tktoplevel()
-  tkwm.title(top, 'TestScorer 1.6')
+  tkwm.title(top, 'TestScorer 1.7.1')
   tkwm.resizable(top, FALSE, FALSE)
   
   testFrame <- tkframe(top, relief="groove",borderwidth=2)  # col 1 for test

@@ -1,2 +1,2 @@
 export(TestScorerGUI)
-import(tcltk)
+import(tcltk, utils)

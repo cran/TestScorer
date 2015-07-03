@@ -2,9 +2,9 @@ Package: TestScorer
 Type: Package
 Title: GUI for Entering Test Items and Obtaining Raw and Transformed
         Scores
-Version: 1.7
-Date: 2015-04-19
-Imports: tcltk
+Version: 1.7.1
+Date: 2015-07-02
+Imports: tcltk, utils
 Author: Manel Salamero
 Maintainer: Manel Salamero <manelsalamero@gmail.com>
 Description: GUI for entering test items and obtaining raw
@@ -14,6 +14,6 @@ Description: GUI for entering test items and obtaining raw
    scoring procedures through a GUI.
 License: GPL-2
 NeedsCompilation: no
-Packaged: 2015-04-20 15:01:03 UTC; ms
+Packaged: 2015-07-02 19:19:34 UTC; ms
 Repository: CRAN
-Date/Publication: 2015-04-20 17:45:12
+Date/Publication: 2015-07-03 01:24:37

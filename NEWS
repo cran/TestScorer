@@ -1,3 +1,6 @@
+1.7.1
+  * Add imports to the NAMESPACE file per a request from CRAN
+  * Minor documentation changes
 1.7 (2015-04-19)
   * Some code improvements
 1.6 (2014-07-04)
