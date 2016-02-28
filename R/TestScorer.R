@@ -1,6 +1,6 @@
 # ==================================================================================
-# TestScorer 1.7.1
-# Last modification: 2015.07.02
+# TestScorer 1.7.2
+# Last modification: 2016.02.18
 # ==================================================================================
 
 # ==================================================================================
@@ -79,7 +79,7 @@ TestScorerGUI <- function() {
   # top window with three columns: test, id, items
   # -----------------------------------------------
   top <- tktoplevel()
-  tkwm.title(top, 'TestScorer 1.7.1')
+  tkwm.title(top, 'TestScorer 1.7.2')
   tkwm.resizable(top, FALSE, FALSE)
   
   testFrame <- tkframe(top, relief="groove",borderwidth=2)  # col 1 for test
@@ -119,7 +119,7 @@ TestScorerGUI <- function() {
     choiceFrame <- tkframe(choice.top, relief="groove", borderwidth=2)
     tkgrid(choiceFrame)
     
-    rb.dont     <- tkradiobutton(choice.top)
+    rb.dont <- tkradiobutton(choice.top)
     rb.new <- tkradiobutton(choice.top)
     rb.exist <- tkradiobutton(choice.top)
     rbChoice <- tclVar("dont")
@@ -683,7 +683,7 @@ TestScorerGUI <- function() {
     msg <- paste('   -------------------------------------------------------',
                  '   | To exit the R session close the window or type: q() |',
                  '   |                                                     |',                 
-                 '   | TestScorer don not use the workspace image, so      |',
+                 '   | TestScorer do not use the workspace image, so       |',
                  '   | you can safely answer "No" to the next question.    |',
                  '   -------------------------------------------------------',
                  sep='\n')
@@ -864,6 +864,8 @@ set.tests.directory <- function() {
           file.copy(from=system.file('some.stuff/TST_MHLC.r',
                                      package='TestScorer'), to=working.dir)
           file.copy(from=system.file('some.stuff/TST_RAAS.r',
+                                     package='TestScorer'), to=working.dir)
+          file.copy(from=system.file('some.stuff/TST_IPIP50.r',
                                      package='TestScorer'), to=working.dir)
           file.copy(from=system.file('some.stuff/Help.txt',
                                      package='TestScorer'), to=working.dir)
@@ -1448,7 +1450,7 @@ add.new.test <- function() {
     
     if (sum(nchar(reversed))!=0) {  # some rev have been defined
       cat('\n  # Items which should be reversed', file='tmp', append=TRUE)
-      cat('\n  reversed.items=c(', file='tmp', append=TRUE)
+      cat('\n  reversed.items <- c(', file='tmp', append=TRUE)
       if (length(reversed)>1)
         for (i in 1:(length(reversed)-1)) cat(paste(reversed[i], ', ', sep=''), file='tmp', append=TRUE)
       cat(paste(reversed[length(reversed)],
@@ -2357,5 +2359,5 @@ delete.test <- function() {
   }
   
   TestScorerGUI() # reopenss the main GUI, updating the catalog
-} # end detete test
+} # end delete test
       

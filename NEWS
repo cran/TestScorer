@@ -1,8 +1,14 @@
-1.7.1
+1.7.2 (2016-02-18)
+  * More test examples included
+  * Minor documentation changes
+
+1.7.1 (2015-07-02)
   * Add imports to the NAMESPACE file per a request from CRAN
   * Minor documentation changes
+  
 1.7 (2015-04-19)
   * Some code improvements
+  
 1.6 (2014-07-04)
   * Some code improvements
   * Documentation improved

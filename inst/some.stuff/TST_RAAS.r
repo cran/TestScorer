@@ -109,32 +109,31 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
   # --------------------
   names(results)[6] <- "0    10   20   30   40   50   60   70   80   90  100"
 
-  # ===== ADDITIONAL CODE INSERTED MANUALLY
-  # Combine C & D scales
-  CD <- round(mean(c(results[1, 'Raw'], results[2, 'Raw'])), 2)
-  results[4, ] <- c("", "", "", "", "", "") # blank row to improve readability
-  results[5, ] <- c("CD", "Close/Dependent", "", CD, "", "") # no data for T score
-  
-  # Attachment style assignement
-  if (is.na(CD)) style <- "Not evaluable" # if all answers are missings
-  else if (CD > 3 & results[3, "Raw"] < 3) style <- "Secure"
-  else if (CD > 3 & results[3, "Raw"] > 3) style <- "Preoccupied"
-  else if (CD < 3 & results[3, "Raw"] < 3) style <- "Dismissing"
-  else if (CD < 3 & results[3, "Raw"] > 3) style <- "Fearful"
-  else style <- "Not classificable"
+  # Combine C & D scales                                                                 ### CODE INSERTED MANUALLY
+  CD <- round(mean(c(results[1, 'Raw'], results[2, 'Raw'])), 2)                          ###
+  results[4, ] <- c("", "", "", "", "", "") # blank row to improve readability           ###
+  results[5, ] <- c("CD", "Close/Dependent", "", CD, "", "") # no data for T score       ###
 
-  # Show style as a plot
-  windows(title="Attachment style")
-  plot(CD, results[3, "Raw"], xlim=c(1,5), ylim=c(1,5), pch=3, cex=2, col="blue", lwd=5,
-       xlab="Close/Dependent", ylab="Anxiety", main=paste(id, date.test),
-       font.sub=2, sub="The position of the subject is represented by a blue cross")
-  abline(v=3)
-  abline(h=3)
-  text(2, 2, labels="Dismissing", col="gray60", font=2, cex=2)
-  text(4, 2, labels="Secure", col="gray60", font=2, cex=2)
-  text(2, 4, labels="Fearful", col="gray60", font=2, cex=2)
-  text(4, 4, labels="Preocupied", col="gray60", font=2, cex=2)
-  # ===== END ADDITIONAL CODE INSERTED MANUALLY
+  # Attachment style assignement                                                         ###
+  if (is.na(CD)) style <- "Not evaluable" # if all answers are missings                  ###
+  else if (CD > 3 & results[3, "Raw"] < 3) style <- "Secure"                             ###
+  else if (CD > 3 & results[3, "Raw"] > 3) style <- "Preoccupied"                        ###
+  else if (CD < 3 & results[3, "Raw"] < 3) style <- "Dismissing"                         ###
+  else if (CD < 3 & results[3, "Raw"] > 3) style <- "Fearful"                            ###
+  else style <- "Not classificable"                                                      ###
+
+  # Show style as a plot                                                                 ### CODE INSERTED MANUALLY
+  windows(title="Attachment style")                                                      ###
+  require(graph)                                                                         ###
+  plot(CD, results[3, "Raw"], xlim=c(1,5), ylim=c(1,5), pch=3, cex=2, col="blue", lwd=5, ###
+       xlab="Close/Dependent", ylab="Anxiety", main=paste(id, date.test),                ###
+       font.sub=2, sub="The position of the subject is represented by a blue cross")     ###
+  abline(v=3)                                                                            ###
+  abline(h=3)                                                                            ###
+  text(2, 2, labels="Dismissing", col="gray60", font=2, cex=2)                           ###
+  text(4, 2, labels="Secure", col="gray60", font=2, cex=2)                               ###
+  text(2, 4, labels="Fearful", col="gray60", font=2, cex=2)                              ###
+  text(4, 4, labels="Preocupied", col="gray60", font=2, cex=2)                           ###
   
   # Output in form of list
   # ------------------
@@ -144,16 +143,14 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
                             pcnt.blanks,
                             "%)",
                             sep=""),
-                      # ===== ADDITIONAL CODE INSERTED MANUALLY
-                      "",
-                      'According to the author, attach styles assignement "is quite exploratory...',
-                      '[use] with caution, and only in conjunction with the continuous measures."',
-                      "",
-                      paste("Attach style:", style),
-                      "",
-                      "T-scores computed using mean and standard deviation from 414 USA college students,",
-                      "reported by Ledley et al. J Psychopath Behav Assess 2006, 28:33-40."
-                      # ===== END ADDITIONAL CODE INSERTED MANUALLY
+                      "",                                                                                    ### CODE INSERTED MANUALLY
+                      'According to the author, attach styles assignement "is quite exploratory...',         ###
+                      '[use] with caution, and only in conjunction with the continuous measures."',          ###
+                      "",                                                                                    ###
+                      paste("Attach style:", style),                                                         ###
+                      "",                                                                                    ###
+                      "T-scores computed using mean and standard deviation from 414 USA college students,",  ###
+                      "reported by Ledley et al. J Psychopath Behav Assess 2006, 28:33-40."                  ###
                      )                            
 
   # Return results

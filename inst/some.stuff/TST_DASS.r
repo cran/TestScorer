@@ -90,11 +90,9 @@ scoring.fun <- function(answers, sex, age, id, date.test, comm) {
                             pcnt.blanks,
                             "%)",
                             sep=""),
-                      # ===== ADDITIONAL CODE INSERTED MANUALLY
-                      paste("\nNormative data from a non-clinical British sample. Data from",
-                            "JR Crawford & JD Henry, Br J Clin Psychol 2003, 42:111-131.",
-                            sep='\n')
-                      # ===== END ADDITIONAL CODE INSERTED MANUALLY
+                      paste("\nNormative data from a non-clinical British sample. Data from", ### CODE INSERTED MANUALLY
+                            "JR Crawford & JD Henry, Br J Clin Psychol 2003, 42:111-131.",    ###
+                            sep='\n')                                                         ###
                      )
 
   # Return results
